@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+	<!-- Point this at your own backend (see backend/README.md). localhost works in the Simulator. -->
+	<key>CoachSyncBackendURL</key>
+	<string>http://localhost:8080</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<!-- Allows plain-HTTP to localhost / LAN hosts for local development only. -->
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+	</dict>
+	<!-- iOS 14+ gates local-network access behind a user prompt. Without this key the prompt
+	     never appears and the connection fails silently — no error, no dialog, just a sync
+	     that never completes. -->
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>CoachSync syncs your practices with your CoachSync server.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>CoachSync uses your location to show current weather conditions on the Dashboard, so you can plan on-water practices.</string>
+</dict>
+</plist>

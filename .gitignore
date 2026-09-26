@@ -1,0 +1,12 @@
+.DS_Store
+build/
+DerivedData/
+*.xcuserstate
+xcuserdata/
+.claude/worktrees/
+.idea/
+.vscode/
+
+# iCloud-sync duplicate-file/folder artifacts (e.g. "Models 2.swift", "main 2/", "ClubService 3.java")
+* [0-9]
+* [0-9].*

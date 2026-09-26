@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="https://jakarta.ee/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence
+                                 https://jakarta.ee/xml/ns/persistence/persistence_3_2.xsd"
+             version="3.2">
+
+    <!--
+      Standalone persistence unit used ONLY by SchemaExportTest to generate the
+      MySQL-dialect DDL script with no live database. Entities are listed
+      explicitly so the unit needs no classpath scanning or datasource.
+    -->
+    <persistence-unit name="coachsync-ddl" transaction-type="RESOURCE_LOCAL">
+        <class>com.coachsync.domain.Club</class>
+        <class>com.coachsync.domain.Coach</class>
+        <class>com.coachsync.domain.Athlete</class>
+        <class>com.coachsync.domain.Team</class>
+        <class>com.coachsync.domain.TeamMembership</class>
+        <class>com.coachsync.domain.CoachSession</class>
+        <class>com.coachsync.domain.SessionBlock</class>
+        <class>com.coachsync.domain.AttendanceRecord</class>
+        <class>com.coachsync.domain.PerformanceRecord</class>
+        <class>com.coachsync.domain.AthleteNote</class>
+        <class>com.coachsync.domain.TechnicalAssessment</class>
+        <class>com.coachsync.domain.TechnicalRating</class>
+        <class>com.coachsync.domain.KtcAssessment</class>
+        <class>com.coachsync.domain.DevelopmentNote</class>
+        <class>com.coachsync.domain.RegattaResult</class>
+        <class>com.coachsync.domain.FitnessTestResult</class>
+        <class>com.coachsync.domain.HeightRecord</class>
+        <exclude-unlisted-classes>true</exclude-unlisted-classes>
+        <properties>
+            <!-- Match Spring Boot's runtime physical naming (camelCase -> snake_case)
+                 so this review DDL mirrors the schema the app actually creates. -->
+            <property name="hibernate.physical_naming_strategy"
+                      value="org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy"/>
+        </properties>
+    </persistence-unit>
+</persistence>

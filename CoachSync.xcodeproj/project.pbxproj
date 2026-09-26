@@ -1,0 +1,850 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		4DE2B452DC43913E882E2C01 /* LocalWipeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5D741E28A9614381BE6EC64 /* LocalWipeTests.swift */; };
+		1DB2069BD72AF450C94F45F9 /* CSVParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DB5181B4421706320C4C21C /* CSVParserTests.swift */; };
+		54415AF1BB3BE72769C48725 /* CoachSyncUITestsLaunch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FEFC6E777C9BADCBE10EBF0 /* CoachSyncUITestsLaunch.swift */; };
+		65DB875ADFA4402B06096C3B /* LoadRulesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6C97A233A9DDE6EC90042E2 /* LoadRulesTests.swift */; };
+		734D7EAC4DD762C1A710E4AC /* CoachSyncUITestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E3B26210AD5F8A151B291FE /* CoachSyncUITestCase.swift */; };
+		76D1EA07BA684F1369FC43C4 /* SessionSheetUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E185CA6FB914D3A288B712D /* SessionSheetUITests.swift */; };
+		998B2A77E210B91098B67BDD /* TabNavigationUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D79BD517B8A69C594F874AD /* TabNavigationUITests.swift */; };
+		C0DEC0DE0000000000000011 /* TimeParsingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DEC0DE0000000000000001 /* TimeParsingTests.swift */; };
+		C0DEC0DE0000000000000013 /* SeasonContextTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DEC0DE0000000000000014 /* SeasonContextTests.swift */; };
+		C0DEC0DE0000000000000021 /* InsightSignalsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DEC0DE0000000000000020 /* InsightSignalsTests.swift */; };
+		C0DEC0DE0000000000000041 /* TestSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DEC0DE0000000000000040 /* TestSupport.swift */; };
+		C0DEC0DE0000000000000043 /* CascadeDeleteTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DEC0DE0000000000000042 /* CascadeDeleteTests.swift */; };
+		C0DEC0DE0000000000000045 /* SlotReconciliationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DEC0DE0000000000000044 /* SlotReconciliationTests.swift */; };
+		C0DEC0DE0000000000000050 /* AuthTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DEC0DE0000000000000051 /* AuthTests.swift */; };
+		C0DEC0DE0000000000000052 /* SyncTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DEC0DE0000000000000053 /* SyncTests.swift */; };
+		C0DEC0DE0000000000000061 /* NeedsAttentionSortTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DEC0DE0000000000000060 /* NeedsAttentionSortTests.swift */; };
+		C0DEC0DE0000000000000071 /* WeatherLogicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DEC0DE0000000000000070 /* WeatherLogicTests.swift */; };
+		EA9AFB5D501D99021BE37ED8 /* AthleteCRUDUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 706CC47037B5657FBD146DAD /* AthleteCRUDUITests.swift */; };
+		FC14CD2B9B43619299A34AB6 /* SessionLoggingUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FE37D632C4EA833E6184165 /* SessionLoggingUITests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		18A687E32FA696E200F35DE7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 18A060052F843F720015A9B5 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 18A0600C2F843F720015A9B5;
+			remoteInfo = CoachSync;
+		};
+		A85E4792FBB001566EDBACC8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 18A060052F843F720015A9B5 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 18A0600C2F843F720015A9B5;
+			remoteInfo = CoachSync;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		0D79BD517B8A69C594F874AD /* TabNavigationUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TabNavigationUITests.swift; sourceTree = "<group>"; };
+		1835A4362F871006003FA90D /* CoachSyncMac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CoachSyncMac.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		18A0600D2F843F720015A9B5 /* CoachSync.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CoachSync.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		2E185CA6FB914D3A288B712D /* SessionSheetUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SessionSheetUITests.swift; sourceTree = "<group>"; };
+		3FE37D632C4EA833E6184165 /* SessionLoggingUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SessionLoggingUITests.swift; sourceTree = "<group>"; };
+		706CC47037B5657FBD146DAD /* AthleteCRUDUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AthleteCRUDUITests.swift; sourceTree = "<group>"; };
+		7F813166638CFCAD96C33187 /* CoachSyncUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CoachSyncUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		8FEFC6E777C9BADCBE10EBF0 /* CoachSyncUITestsLaunch.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CoachSyncUITestsLaunch.swift; sourceTree = "<group>"; };
+		9E3B26210AD5F8A151B291FE /* CoachSyncUITestCase.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CoachSyncUITestCase.swift; sourceTree = "<group>"; };
+		A5D741E28A9614381BE6EC64 /* LocalWipeTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LocalWipeTests.swift; sourceTree = "<group>"; };
+		1DB5181B4421706320C4C21C /* CSVParserTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CSVParserTests.swift; sourceTree = "<group>"; };
+		C0DEC0DE0000000000000001 /* TimeParsingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeParsingTests.swift; sourceTree = "<group>"; };
+		C0DEC0DE0000000000000003 /* CoachSyncTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CoachSyncTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		C0DEC0DE0000000000000014 /* SeasonContextTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeasonContextTests.swift; sourceTree = "<group>"; };
+		C0DEC0DE0000000000000020 /* InsightSignalsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightSignalsTests.swift; sourceTree = "<group>"; };
+		C0DEC0DE0000000000000040 /* TestSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestSupport.swift; sourceTree = "<group>"; };
+		C0DEC0DE0000000000000042 /* CascadeDeleteTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CascadeDeleteTests.swift; sourceTree = "<group>"; };
+		C0DEC0DE0000000000000044 /* SlotReconciliationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlotReconciliationTests.swift; sourceTree = "<group>"; };
+		C0DEC0DE0000000000000051 /* AuthTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthTests.swift; sourceTree = "<group>"; };
+		C0DEC0DE0000000000000053 /* SyncTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncTests.swift; sourceTree = "<group>"; };
+		C0DEC0DE0000000000000060 /* NeedsAttentionSortTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NeedsAttentionSortTests.swift; sourceTree = "<group>"; };
+		C0DEC0DE0000000000000070 /* WeatherLogicTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherLogicTests.swift; sourceTree = "<group>"; };
+		C6C97A233A9DDE6EC90042E2 /* LoadRulesTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LoadRulesTests.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		183123592FBD75BA00D36104 /* Exceptions for "CoachSync" folder in "CoachSync" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 18A0600C2F843F720015A9B5 /* CoachSync */;
+		};
+		1835A4442F87106B003FA90D /* Exceptions for "CoachSync" folder in "CoachSyncMac" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				CoachSyncApp.swift,
+				ContentView.swift,
+				Info.plist,
+			);
+			target = 1835A4352F871006003FA90D /* CoachSyncMac */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		1835A4372F871006003FA90D /* CoachSyncMac */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
+			path = CoachSyncMac;
+			sourceTree = "<group>";
+		};
+		18A0600F2F843F720015A9B5 /* CoachSync */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				183123592FBD75BA00D36104 /* Exceptions for "CoachSync" folder in "CoachSync" target */,
+				1835A4442F87106B003FA90D /* Exceptions for "CoachSync" folder in "CoachSyncMac" target */,
+			);
+			path = CoachSync;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		1835A4332F871006003FA90D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		18A0600A2F843F720015A9B5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7529B8521F1F2562EE6EB7DA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C0DEC0DE0000000000000007 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		18A060042F843F720015A9B5 = {
+			isa = PBXGroup;
+			children = (
+				18A0600F2F843F720015A9B5 /* CoachSync */,
+				1835A4372F871006003FA90D /* CoachSyncMac */,
+				C0DEC0DE0000000000000004 /* CoachSyncTests */,
+				18A687E22FA6969C00F35DE7 /* Frameworks */,
+				18A0600E2F843F720015A9B5 /* Products */,
+				DE0A7593AFC1CA9715A7A816 /* CoachSyncUITests */,
+			);
+			sourceTree = "<group>";
+		};
+		18A0600E2F843F720015A9B5 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				18A0600D2F843F720015A9B5 /* CoachSync.app */,
+				1835A4362F871006003FA90D /* CoachSyncMac.app */,
+				C0DEC0DE0000000000000003 /* CoachSyncTests.xctest */,
+				7F813166638CFCAD96C33187 /* CoachSyncUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		18A687E22FA6969C00F35DE7 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		C0DEC0DE0000000000000004 /* CoachSyncTests */ = {
+			isa = PBXGroup;
+			children = (
+				C0DEC0DE0000000000000001 /* TimeParsingTests.swift */,
+				C0DEC0DE0000000000000014 /* SeasonContextTests.swift */,
+				C0DEC0DE0000000000000020 /* InsightSignalsTests.swift */,
+				C0DEC0DE0000000000000040 /* TestSupport.swift */,
+				C0DEC0DE0000000000000042 /* CascadeDeleteTests.swift */,
+				C0DEC0DE0000000000000044 /* SlotReconciliationTests.swift */,
+				C0DEC0DE0000000000000051 /* AuthTests.swift */,
+				C0DEC0DE0000000000000053 /* SyncTests.swift */,
+				C0DEC0DE0000000000000060 /* NeedsAttentionSortTests.swift */,
+				C0DEC0DE0000000000000070 /* WeatherLogicTests.swift */,
+				C6C97A233A9DDE6EC90042E2 /* LoadRulesTests.swift */,
+				A5D741E28A9614381BE6EC64 /* LocalWipeTests.swift */,
+				1DB5181B4421706320C4C21C /* CSVParserTests.swift */,
+			);
+			path = CoachSyncTests;
+			sourceTree = "<group>";
+		};
+		DE0A7593AFC1CA9715A7A816 /* CoachSyncUITests */ = {
+			isa = PBXGroup;
+			children = (
+				8FEFC6E777C9BADCBE10EBF0 /* CoachSyncUITestsLaunch.swift */,
+				9E3B26210AD5F8A151B291FE /* CoachSyncUITestCase.swift */,
+				0D79BD517B8A69C594F874AD /* TabNavigationUITests.swift */,
+				706CC47037B5657FBD146DAD /* AthleteCRUDUITests.swift */,
+				2E185CA6FB914D3A288B712D /* SessionSheetUITests.swift */,
+				3FE37D632C4EA833E6184165 /* SessionLoggingUITests.swift */,
+			);
+			name = CoachSyncUITests;
+			path = CoachSyncUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		1835A4352F871006003FA90D /* CoachSyncMac */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1835A4402F871007003FA90D /* Build configuration list for PBXNativeTarget "CoachSyncMac" */;
+			buildPhases = (
+				1835A4322F871006003FA90D /* Sources */,
+				1835A4332F871006003FA90D /* Frameworks */,
+				1835A4342F871006003FA90D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				1835A4372F871006003FA90D /* CoachSyncMac */,
+				18A0600F2F843F720015A9B5 /* CoachSync */,
+			);
+			name = CoachSyncMac;
+			productName = CoachSyncMac;
+			productReference = 1835A4362F871006003FA90D /* CoachSyncMac.app */;
+			productType = "com.apple.product-type.application";
+		};
+		18A0600C2F843F720015A9B5 /* CoachSync */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 18A0601A2F843F730015A9B5 /* Build configuration list for PBXNativeTarget "CoachSync" */;
+			buildPhases = (
+				18A060092F843F720015A9B5 /* Sources */,
+				18A0600A2F843F720015A9B5 /* Frameworks */,
+				18A0600B2F843F720015A9B5 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				18A0600F2F843F720015A9B5 /* CoachSync */,
+			);
+			name = CoachSync;
+			productName = CoachSync;
+			productReference = 18A0600D2F843F720015A9B5 /* CoachSync.app */;
+			productType = "com.apple.product-type.application";
+		};
+		6F306F5C6930360D7CD4ADA9 /* CoachSyncUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0D1734539E54A26479F77363 /* Build configuration list for PBXNativeTarget "CoachSyncUITests" */;
+			buildPhases = (
+				5B9E99E9266166DD8CE2050A /* Sources */,
+				7529B8521F1F2562EE6EB7DA /* Frameworks */,
+				AF0BB4072A819136BC5486C2 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				C4468BCEF0E443063EC9D410 /* PBXTargetDependency */,
+			);
+			name = CoachSyncUITests;
+			productName = CoachSyncUITests;
+			productReference = 7F813166638CFCAD96C33187 /* CoachSyncUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		C0DEC0DE0000000000000005 /* CoachSyncTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C0DEC0DE0000000000000033 /* Build configuration list for PBXNativeTarget "CoachSyncTests" */;
+			buildPhases = (
+				C0DEC0DE0000000000000006 /* Sources */,
+				C0DEC0DE0000000000000007 /* Frameworks */,
+				C0DEC0DE0000000000000008 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				18A687E42FA696E200F35DE7 /* PBXTargetDependency */,
+			);
+			name = CoachSyncTests;
+			productName = CoachSyncTests;
+			productReference = C0DEC0DE0000000000000003 /* CoachSyncTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		18A060052F843F720015A9B5 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2640;
+				LastUpgradeCheck = 2650;
+				TargetAttributes = {
+					1835A4352F871006003FA90D = {
+						CreatedOnToolsVersion = 26.4;
+					};
+					18A0600C2F843F720015A9B5 = {
+						CreatedOnToolsVersion = 26.4;
+					};
+					6F306F5C6930360D7CD4ADA9 = {
+						CreatedOnToolsVersion = 26.4;
+						TestTargetID = 18A0600C2F843F720015A9B5;
+					};
+					C0DEC0DE0000000000000005 = {
+						CreatedOnToolsVersion = 26.4;
+					};
+				};
+			};
+			buildConfigurationList = 18A060082F843F720015A9B5 /* Build configuration list for PBXProject "CoachSync" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 18A060042F843F720015A9B5;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 18A0600E2F843F720015A9B5 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				18A0600C2F843F720015A9B5 /* CoachSync */,
+				1835A4352F871006003FA90D /* CoachSyncMac */,
+				C0DEC0DE0000000000000005 /* CoachSyncTests */,
+				6F306F5C6930360D7CD4ADA9 /* CoachSyncUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		1835A4342F871006003FA90D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		18A0600B2F843F720015A9B5 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AF0BB4072A819136BC5486C2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C0DEC0DE0000000000000008 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		1835A4322F871006003FA90D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		18A060092F843F720015A9B5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5B9E99E9266166DD8CE2050A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				54415AF1BB3BE72769C48725 /* CoachSyncUITestsLaunch.swift in Sources */,
+				734D7EAC4DD762C1A710E4AC /* CoachSyncUITestCase.swift in Sources */,
+				998B2A77E210B91098B67BDD /* TabNavigationUITests.swift in Sources */,
+				EA9AFB5D501D99021BE37ED8 /* AthleteCRUDUITests.swift in Sources */,
+				76D1EA07BA684F1369FC43C4 /* SessionSheetUITests.swift in Sources */,
+				FC14CD2B9B43619299A34AB6 /* SessionLoggingUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C0DEC0DE0000000000000006 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C0DEC0DE0000000000000045 /* SlotReconciliationTests.swift in Sources */,
+				C0DEC0DE0000000000000011 /* TimeParsingTests.swift in Sources */,
+				C0DEC0DE0000000000000013 /* SeasonContextTests.swift in Sources */,
+				C0DEC0DE0000000000000021 /* InsightSignalsTests.swift in Sources */,
+				C0DEC0DE0000000000000041 /* TestSupport.swift in Sources */,
+				C0DEC0DE0000000000000043 /* CascadeDeleteTests.swift in Sources */,
+				C0DEC0DE0000000000000050 /* AuthTests.swift in Sources */,
+				C0DEC0DE0000000000000052 /* SyncTests.swift in Sources */,
+				C0DEC0DE0000000000000061 /* NeedsAttentionSortTests.swift in Sources */,
+				C0DEC0DE0000000000000071 /* WeatherLogicTests.swift in Sources */,
+				65DB875ADFA4402B06096C3B /* LoadRulesTests.swift in Sources */,
+				4DE2B452DC43913E882E2C01 /* LocalWipeTests.swift in Sources */,
+				1DB2069BD72AF450C94F45F9 /* CSVParserTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		18A687E42FA696E200F35DE7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 18A0600C2F843F720015A9B5 /* CoachSync */;
+			targetProxy = 18A687E32FA696E200F35DE7 /* PBXContainerItemProxy */;
+		};
+		C4468BCEF0E443063EC9D410 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = CoachSync;
+			target = 18A0600C2F843F720015A9B5 /* CoachSync */;
+			targetProxy = A85E4792FBB001566EDBACC8 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		1835A4412F871007003FA90D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = CoachSyncMac/CoachSyncMac.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 8;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CoachSyncMac/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.sports";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 26.4;
+				MARKETING_VERSION = 1.2;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.CoachSyncMac;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = macosx;
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 6;
+			};
+			name = Debug;
+		};
+		1835A4422F871007003FA90D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = CoachSyncMac/CoachSyncMac.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 8;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CoachSyncMac/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.sports";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 26.4;
+				MARKETING_VERSION = 1.2;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.CoachSyncMac;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = macosx;
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 6;
+			};
+			name = Release;
+		};
+		18A060182F843F730015A9B5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		18A060192F843F730015A9B5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		18A0601B2F843F730015A9B5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = CoachSync/CoachSync.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 8;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CoachSync/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.sports";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.2;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.CoachSync;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		18A0601C2F843F730015A9B5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = CoachSync/CoachSync.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 8;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CoachSync/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.sports";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.2;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.CoachSync;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		8D18FCE74C997AD47E49A9DD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 8;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
+				MARKETING_VERSION = 1.2;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.CoachSyncUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = CoachSync;
+			};
+			name = Release;
+		};
+		C0DEC0DE0000000000000031 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 8;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_TESTABILITY = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.2;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.CoachSyncTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CoachSync.app/CoachSync";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Debug;
+		};
+		C0DEC0DE0000000000000032 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 8;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.2;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.CoachSyncTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CoachSync.app/CoachSync";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Release;
+		};
+		EA3F65C4787D91E3271DAE74 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 8;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
+				MARKETING_VERSION = 1.2;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.CoachSyncUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = CoachSync;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		0D1734539E54A26479F77363 /* Build configuration list for PBXNativeTarget "CoachSyncUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EA3F65C4787D91E3271DAE74 /* Debug */,
+				8D18FCE74C997AD47E49A9DD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1835A4402F871007003FA90D /* Build configuration list for PBXNativeTarget "CoachSyncMac" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1835A4412F871007003FA90D /* Debug */,
+				1835A4422F871007003FA90D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		18A060082F843F720015A9B5 /* Build configuration list for PBXProject "CoachSync" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				18A060182F843F730015A9B5 /* Debug */,
+				18A060192F843F730015A9B5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		18A0601A2F843F730015A9B5 /* Build configuration list for PBXNativeTarget "CoachSync" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				18A0601B2F843F730015A9B5 /* Debug */,
+				18A0601C2F843F730015A9B5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C0DEC0DE0000000000000033 /* Build configuration list for PBXNativeTarget "CoachSyncTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C0DEC0DE0000000000000031 /* Debug */,
+				C0DEC0DE0000000000000032 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 18A060052F843F720015A9B5 /* Project object */;
+}
