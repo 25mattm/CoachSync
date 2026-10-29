@@ -3,10 +3,22 @@ build/
 DerivedData/
 *.xcuserstate
 xcuserdata/
-.claude/worktrees/
+.claude/
 .idea/
 .vscode/
 
 # iCloud-sync duplicate-file/folder artifacts (e.g. "Models 2.swift", "main 2/", "ClubService 3.java")
 * [0-9]
 * [0-9].*
+
+# Private working notes and agent files: this repo is public, keep these local only
+CLAUDE.md
+AGENTS.md
+BACKLOG.md
+DEPLOY.md
+*_Review_*.md
+*SESSION_REPORT*.md
+docs/HANDOFF_*.md
+backend/target/
+.env
+.env.*
