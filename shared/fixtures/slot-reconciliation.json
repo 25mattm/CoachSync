@@ -1,0 +1,80 @@
+{
+  "description": "Shared cases for rep-slot reconciliation of one block. Run by both the iOS SlotReconciliationTests.testSharedFixtureCases (ModelContext.reconcileSlots) and the backend SlotReconciliationFixtureTest (SlotGenerationService.planBlock), so the two implementations can't drift. blockType is the iOS display string. Existing slot state is pending (no result), time, dns or dnf. expected.slots lists every slot left on the block as athlete#rep; expected.changes counts slots deleted plus inserted.",
+  "cases": [
+    {
+      "name": "fresh block gets a slot per present athlete per rep",
+      "blockType": "Paddle Distance", "repetitionCount": 3, "present": ["A", "B"],
+      "existing": [],
+      "expected": { "slots": ["A#1", "A#2", "A#3", "B#1", "B#2", "B#3"], "changes": 6 }
+    },
+    {
+      "name": "a repetition count below one still gets one slot",
+      "blockType": "Run Distance", "repetitionCount": 0, "present": ["A"],
+      "existing": [],
+      "expected": { "slots": ["A#1"], "changes": 1 }
+    },
+    {
+      "name": "pyramid and interval types capture per-rep data",
+      "blockType": "Paddle Pyramid", "repetitionCount": 2, "present": ["A"],
+      "existing": [],
+      "expected": { "slots": ["A#1", "A#2"], "changes": 2 }
+    },
+    {
+      "name": "note-only type gets no slots and loses unfilled ones",
+      "blockType": "Weights", "repetitionCount": 3, "present": ["A"],
+      "existing": [
+        { "athlete": "A", "rep": 1, "state": "pending" },
+        { "athlete": "A", "rep": 2, "state": "time" }
+      ],
+      "expected": { "slots": ["A#2"], "changes": 1 }
+    },
+    {
+      "name": "shrinking prunes unfilled slots beyond capacity but keeps results",
+      "blockType": "Paddle Distance", "repetitionCount": 2, "present": ["A"],
+      "existing": [
+        { "athlete": "A", "rep": 1, "state": "time" },
+        { "athlete": "A", "rep": 2, "state": "pending" },
+        { "athlete": "A", "rep": 3, "state": "pending" },
+        { "athlete": "A", "rep": 4, "state": "dns" }
+      ],
+      "expected": { "slots": ["A#1", "A#2", "A#4"], "changes": 1 }
+    },
+    {
+      "name": "growing fills in the missing reps",
+      "blockType": "Paddle Time Pieces", "repetitionCount": 3, "present": ["A"],
+      "existing": [
+        { "athlete": "A", "rep": 1, "state": "time" }
+      ],
+      "expected": { "slots": ["A#1", "A#2", "A#3"], "changes": 2 }
+    },
+    {
+      "name": "an athlete no longer present loses unfilled slots only",
+      "blockType": "Run Intervals", "repetitionCount": 2, "present": ["A"],
+      "existing": [
+        { "athlete": "B", "rep": 1, "state": "pending" },
+        { "athlete": "B", "rep": 2, "state": "dnf" }
+      ],
+      "expected": { "slots": ["A#1", "A#2", "B#2"], "changes": 3 }
+    },
+    {
+      "name": "an absent athlete's unfilled slot beyond capacity is pruned once",
+      "blockType": "Paddle Distance", "repetitionCount": 1, "present": [],
+      "existing": [
+        { "athlete": "B", "rep": 1, "state": "pending" },
+        { "athlete": "B", "rep": 2, "state": "pending" }
+      ],
+      "expected": { "slots": [], "changes": 2 }
+    },
+    {
+      "name": "an already reconciled block is left alone",
+      "blockType": "Paddle Distance", "repetitionCount": 2, "present": ["A", "B"],
+      "existing": [
+        { "athlete": "A", "rep": 1, "state": "time" },
+        { "athlete": "A", "rep": 2, "state": "pending" },
+        { "athlete": "B", "rep": 1, "state": "dns" },
+        { "athlete": "B", "rep": 2, "state": "pending" }
+      ],
+      "expected": { "slots": ["A#1", "A#2", "B#1", "B#2"], "changes": 0 }
+    }
+  ]
+}

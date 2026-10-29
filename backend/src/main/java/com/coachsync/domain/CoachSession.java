@@ -57,7 +57,7 @@ public class CoachSession extends TenantScoped {
 
     private boolean isArchived = false;
 
-    private Instant createdAt = Instant.now();
+    private Instant createdAt = Timestamps.now();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "coach_id")

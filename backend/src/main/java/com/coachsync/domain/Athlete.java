@@ -53,7 +53,7 @@ public class Athlete extends TenantScoped {
     @Column(nullable = false)
     private DevelopmentStage developmentStage = DevelopmentStage.INITIATION;
 
-    private Instant createdAt = Instant.now();
+    private Instant createdAt = Timestamps.now();
 
     // --- Children: deleting an athlete cascades all recorded history ----------
     @OneToMany(mappedBy = "athlete", cascade = CascadeType.ALL)

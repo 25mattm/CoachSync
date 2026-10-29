@@ -26,7 +26,7 @@ public class Team extends TenantScoped {
 
     private boolean isArchived = false;
 
-    private Instant createdAt = Instant.now();
+    private Instant createdAt = Timestamps.now();
 
     @OneToMany(mappedBy = "team", cascade = CascadeType.ALL)
     private List<TeamMembership> memberships = new ArrayList<>();

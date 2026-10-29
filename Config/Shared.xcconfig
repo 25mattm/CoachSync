@@ -1,0 +1,17 @@
+// Build settings every CoachSync target reads. The values here are public placeholders:
+// they build, run, and test as-is, but an archive refuses them (scripts/check-release-config.sh).
+// Put your own values in Config/Local.xcconfig, which is gitignored; copy
+// Config/Local.xcconfig.example to start.
+
+// Prefix for every target's bundle identifier, e.g. com.yourname -> com.yourname.CoachSync.
+COACHSYNC_BUNDLE_ID_PREFIX = com.example
+
+// Your Apple Developer team ID. Empty builds unsigned or with Xcode's personal team.
+COACHSYNC_DEVELOPMENT_TEAM =
+
+// The backend a Release build talks to (Info.plist CoachSyncBackendURL). Debug builds ignore it
+// and use localhost; see BackendConfig.swift. "//" starts a comment in an xcconfig, so write it
+// as https:/$()/host.
+COACHSYNC_BACKEND_URL = http:/$()/localhost:8080
+
+#include? "Local.xcconfig"

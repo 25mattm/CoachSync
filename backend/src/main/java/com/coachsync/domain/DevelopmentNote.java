@@ -42,7 +42,7 @@ public class DevelopmentNote extends TenantScoped {
     @Column(name = "tag")
     private List<String> tags = new ArrayList<>();
 
-    private Instant createdAt = Instant.now();
+    private Instant createdAt = Timestamps.now();
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "athlete_id", nullable = false)

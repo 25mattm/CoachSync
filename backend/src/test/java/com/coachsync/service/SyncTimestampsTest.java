@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -29,8 +30,23 @@ class SyncTimestampsTest {
 
     @Test
     void aStampWithinTheSkewAllowanceIsKeptVerbatim() {
-        Instant slightlyAhead = Instant.now().plus(Duration.ofMinutes(1));
+        Instant slightlyAhead = Instant.now().plus(Duration.ofMinutes(1)).truncatedTo(ChronoUnit.MICROS);
         assertEquals(slightlyAhead, SyncTimestamps.resolve(slightlyAhead));
+    }
+
+    @Test
+    void aStampIsTruncatedToTheColumnsMicrosecondPrecision() {
+        Instant withNanos = Instant.parse("2026-10-29T12:00:00.123456789Z");
+        assertEquals(Instant.parse("2026-10-29T12:00:00.123456Z"), SyncTimestamps.resolve(withNanos));
+        assertEquals(0, SyncTimestamps.resolve(null).getNano() % 1_000, "now must be stamped at microseconds");
+    }
+
+    @Test
+    void reSendingTheStoredStampIsStale() {
+        // The client echoes back what the server returned; that must not count as a newer write.
+        Instant withNanos = Instant.parse("2026-10-29T12:00:00.123456789Z");
+        Athlete stored = storedAt(SyncTimestamps.resolve(withNanos));
+        assertTrue(SyncTimestamps.isStale(stored, withNanos));
     }
 
     @Test

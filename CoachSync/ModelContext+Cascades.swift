@@ -81,4 +81,46 @@ extension ModelContext {
         orphans.forEach { delete($0) }
         return orphans.count
     }
+
+    /// Reconciles one block's `PerformanceRecord` slots against the present
+    /// athletes: prunes unfilled slots beyond the block's rep capacity, prunes
+    /// unfilled slots of athletes no longer present (so a present-then-absent
+    /// athlete doesn't keep phantom practice history), and inserts a missing
+    /// slot per present athlete × rep. Slots holding recorded data are always
+    /// kept. Mirrors the backend's `SlotGenerationService.planBlock`; both
+    /// run `shared/fixtures/slot-reconciliation.json`. Idempotent. Returns the
+    /// number of slots changed. Does not save.
+    @discardableResult
+    func reconcileSlots(of block: SessionBlock, presentAthletes: [Athlete]) -> Int {
+        let capturesData = block.blockType.capturesPerRepData
+        let totalReps = capturesData ? max(block.repetitionCount, 1) : 0
+
+        // Heal stranded unfilled slots beyond the current rep capacity
+        // (capacity 0 for types with no per-rep tracking).
+        var changes = pruneUnfilledSlots(of: block, beyondRep: totalReps)
+        guard capturesData else { return changes }
+
+        let presentIDs = Set(presentAthletes.map { $0.id })
+        for record in block.performanceRecords ?? [] {
+            guard record.repNumber <= totalReps, // beyond capacity: already pruned above
+                  let athleteID = record.athlete?.id,
+                  !presentIDs.contains(athleteID),
+                  !record.holdsRecordedData else { continue }
+            delete(record)
+            changes += 1
+        }
+
+        for athlete in presentAthletes {
+            for rep in 1...totalReps {
+                let exists = (block.performanceRecords ?? []).contains {
+                    $0.athlete?.id == athlete.id && $0.repNumber == rep
+                }
+                if !exists {
+                    insert(PerformanceRecord(athlete: athlete, sessionBlock: block, repNumber: rep))
+                    changes += 1
+                }
+            }
+        }
+        return changes
+    }
 }

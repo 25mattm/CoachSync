@@ -1,0 +1,27 @@
+{
+  "description": "Guardian email addresses the backend's @Email constraint (AthleteRequest.guardianEmail) accepts or rejects. Run by both the iOS EmailValidationTests (String.isPlausibleEmail) and the backend GuardianEmailFixtureTest, so an address the app accepts can never be refused on every sync push. Values are already trimmed. An empty value means \"no email\" and is handled before validation on both sides, so it is not listed.",
+  "valid": [
+    "jane@example.com",
+    "o'neil+club@mail.example.ca",
+    "user@gmail",
+    "a.b-c_d@x-y.org",
+    "a@b.c",
+    "josé@example.com",
+    "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx@example.com"
+  ],
+  "invalid": [
+    "jane",
+    "jane@",
+    "@example.com",
+    "a@b@c.com",
+    "jane smith@example.com",
+    "jane@example..com",
+    ".jane@example.com",
+    "jane.@example.com",
+    "jane@example.com.",
+    "jane@-example.com",
+    "jane@example-.com",
+    "jane,smith@example.com",
+    "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx@example.com"
+  ]
+}

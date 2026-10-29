@@ -1,6 +1,7 @@
 package com.coachsync.service;
 
 import com.coachsync.domain.BaseEntity;
+import com.coachsync.domain.Timestamps;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -12,7 +13,11 @@ import java.time.Instant;
  * save chokepoint and sends it on every write. A write is accepted only when it is
  * strictly newer than what is stored; otherwise it is ignored ("skip-stale"). A
  * missing incoming timestamp (a legacy / non-sync caller) is treated as "always
- * apply" and stamped with {@link Instant#now()}.
+ * apply" and stamped with now.
+ *
+ * <p>Stamps are kept at the column's microsecond precision ({@link Timestamps}), so the value
+ * a write returns is the value stored, and a client re-sending a stamp it was given compares
+ * equal to it.
  *
  * <p><b>Future timestamps are capped.</b> A device whose clock runs ahead would otherwise
  * store a future {@code updatedAt} that no correctly-clocked device could ever beat, freezing
@@ -42,10 +47,10 @@ final class SyncTimestamps {
 
     /**
      * The timestamp to stamp on an accepted write: the client's, or now if absent or
-     * implausibly far in the future.
+     * implausibly far in the future, at microsecond precision.
      */
     static Instant resolve(Instant incoming) {
-        return incoming != null && !isBeyondSkew(incoming) ? incoming : Instant.now();
+        return incoming != null && !isBeyondSkew(incoming) ? Timestamps.atColumnPrecision(incoming) : Timestamps.now();
     }
 
     private static boolean isBeyondSkew(Instant timestamp) {

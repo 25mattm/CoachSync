@@ -4,6 +4,7 @@ import com.coachsync.domain.Athlete;
 import com.coachsync.domain.CoachSession;
 import com.coachsync.domain.Team;
 import com.coachsync.domain.TeamMembership;
+import com.coachsync.domain.Timestamps;
 import com.coachsync.repository.AthleteRepository;
 import com.coachsync.repository.CoachSessionRepository;
 import com.coachsync.repository.TeamMembershipRepository;
@@ -16,7 +17,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -89,7 +89,7 @@ public class TeamService {
     public Team setArchived(UUID id, boolean archived) {
         Team team = get(id);
         team.setArchived(archived);
-        team.setUpdatedAt(Instant.now());
+        team.setUpdatedAt(Timestamps.now());
         return teams.save(team);
     }
 

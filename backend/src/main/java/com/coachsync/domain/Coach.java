@@ -63,7 +63,7 @@ public class Coach extends BaseEntity {
     @JoinColumn(name = "requested_club_id")
     private Club requestedClub;
 
-    private Instant createdAt = Instant.now();
+    private Instant createdAt = Timestamps.now();
 
     public Club getClub() {
         return club;

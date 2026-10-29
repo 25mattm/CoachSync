@@ -1,6 +1,7 @@
 package com.coachsync.service;
 
 import com.coachsync.domain.Athlete;
+import com.coachsync.domain.Timestamps;
 import com.coachsync.domain.enums.DevelopmentStage;
 import com.coachsync.repository.AthleteRepository;
 import com.coachsync.web.dto.AthleteRequest;
@@ -9,7 +10,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
 import java.util.UUID;
 
 @Service
@@ -84,7 +84,7 @@ public class AthleteService {
     public Athlete setActive(UUID id, boolean active) {
         Athlete athlete = get(id);
         athlete.setActive(active);
-        athlete.setUpdatedAt(Instant.now());
+        athlete.setUpdatedAt(Timestamps.now());
         return athletes.save(athlete);
     }
 

@@ -24,7 +24,7 @@ public class HeightRecord extends TenantScoped {
     @Column(nullable = false)
     private LocalDate date;
 
-    private Instant createdAt = Instant.now();
+    private Instant createdAt = Timestamps.now();
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "athlete_id", nullable = false)

@@ -175,46 +175,10 @@ struct SessionLoggerView: View {
         let presentAthletes = sessionAthletes.filter {
             (attendanceMap[$0.id] ?? session.defaultAttendanceStatus) == .present
         }
-        let presentIDs = Set(presentAthletes.map { $0.id })
         var didChange = false
-        for block in sortedBlocks {
-            let capturesData = block.blockType.capturesPerRepData
-            let totalReps = capturesData ? max(block.repetitionCount, 1) : 0
-
-            // Heal stranded unfilled slots beyond the current rep capacity
-            // (capacity 0 for types with no per-rep tracking).
-            if modelContext.pruneUnfilledSlots(of: block, beyondRep: totalReps) > 0 {
-                didChange = true
-            }
-            guard capturesData else { continue }
-
-            // Prune untouched slots for athletes no longer marked present, so a
-            // present-then-absent athlete doesn't keep phantom practice history.
-            for record in block.performanceRecords ?? [] {
-                guard let athleteID = record.athlete?.id,
-                      !presentIDs.contains(athleteID),
-                      record.status == .pending,
-                      record.recordedTimeMs == nil else { continue }
-                modelContext.delete(record)
-                didChange = true
-            }
-
-            for athlete in presentAthletes {
-                for rep in 1...totalReps {
-                    let exists = (block.performanceRecords ?? []).contains {
-                        $0.athlete?.id == athlete.id && $0.repNumber == rep
-                    }
-                    if !exists {
-                        let slot = PerformanceRecord(
-                            athlete: athlete,
-                            sessionBlock: block,
-                            repNumber: rep
-                        )
-                        modelContext.insert(slot)
-                        didChange = true
-                    }
-                }
-            }
+        for block in sortedBlocks
+        where modelContext.reconcileSlots(of: block, presentAthletes: presentAthletes) > 0 {
+            didChange = true
         }
         if didChange {
             SyncStore.saveLoggingFailure(modelContext, "Performance slot backfill")

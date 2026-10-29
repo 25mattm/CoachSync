@@ -6,6 +6,7 @@ import AuthenticationServices
 
 struct SignInWithAppleButtonView: View {
     @Environment(AuthManager.self) private var auth
+    @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
         SignInWithAppleButton(.signIn) { request in
@@ -13,7 +14,11 @@ struct SignInWithAppleButtonView: View {
         } onCompletion: { result in
             handle(result)
         }
-        .signInWithAppleButtonStyle(.black)
+        // A black button on a dark background loses its shape; Apple's guidelines call for
+        // white there. The view's identity changes with the style so SwiftUI rebuilds the
+        // underlying ASAuthorizationAppleIDButton, which can't restyle in place.
+        .signInWithAppleButtonStyle(colorScheme == .dark ? .white : .black)
+        .id(colorScheme)
         .frame(height: 44)
         .disabled(auth.isAuthenticating)
     }

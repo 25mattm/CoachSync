@@ -45,7 +45,7 @@ public class PerformanceRecord extends TenantScoped {
     @Column(nullable = false)
     private RepEntryStatus status = RepEntryStatus.PENDING;
 
-    private Instant createdAt = Instant.now();
+    private Instant createdAt = Timestamps.now();
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "session_block_id", nullable = false)

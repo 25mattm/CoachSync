@@ -6,9 +6,10 @@ import Foundation
 /// (so a scheme/build can point at a deployed backend), otherwise defaults to the local
 /// dev backend on the simulator's host. Production will set the key to an HTTPS URL.
 ///
-/// `Info.plist`'s `CoachSyncBackendURL` is a development placeholder and there's no
-/// per-configuration override in the Xcode project, so set it for the deployment before
-/// shipping a Release build. Debug builds ignore the key entirely and always use
+/// `Info.plist`'s `CoachSyncBackendURL` comes from `COACHSYNC_BACKEND_URL` in
+/// `Config/Shared.xcconfig`, a localhost placeholder; set the real one in the gitignored
+/// `Config/Local.xcconfig`. An archive refuses to build without an https URL
+/// (`scripts/check-release-config.sh`). Debug builds ignore the key entirely and always use
 /// `defaultBaseURL` — a developer pointing a Debug build at a real deployed backend can set the
 /// `COACHSYNC_BACKEND_URL_OVERRIDE` environment variable on the run scheme instead.
 // `nonisolated` (the module defaults to MainActor isolation): this is pure, thread-safe

@@ -27,7 +27,7 @@ public class AthleteNote extends TenantScoped {
     @Column(nullable = false, length = Length.LONG32)
     private String noteText;
 
-    private Instant createdAt = Instant.now();
+    private Instant createdAt = Timestamps.now();
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "athlete_id", nullable = false)
