@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.containsString;
@@ -146,7 +147,11 @@ class CoachControllerTest {
         Coach reloaded = coaches.findById(id).orElseThrow();
         assertEquals("apple-sub-xyz", reloaded.getAppleUserId(), "Apple link must survive a re-POST");
         assertEquals("coach@example.com", reloaded.getEmail(), "email must survive a re-POST");
-        assertEquals(originalCreatedAt, reloaded.getCreatedAt(), "createdAt must not be reset by a re-POST");
+        // Compared at the column's microsecond precision: on Linux, Instant.now() carries
+        // nanoseconds that the stored value has already dropped, which isn't a reset.
+        assertEquals(originalCreatedAt.truncatedTo(ChronoUnit.MICROS),
+                reloaded.getCreatedAt().truncatedTo(ChronoUnit.MICROS),
+                "createdAt must not be reset by a re-POST");
     }
 
     @Test
