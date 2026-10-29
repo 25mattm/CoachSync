@@ -6,7 +6,7 @@ import XCTest
 final class AthleteCRUDUITests: CoachSyncUITestCase {
 
     func testAddAthleteAppearsInRoster() throws {
-        app.tabBars.buttons["tab.athletes"].tap()
+        app.tab(.athletes).tap()
         XCTAssertTrue(app.navigationBars["Athletes"].waitForExistence(timeout: 2))
 
         app.buttons["athletes.addButton"].tap()

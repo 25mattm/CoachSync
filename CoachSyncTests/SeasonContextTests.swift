@@ -111,6 +111,15 @@ final class SeasonContextTests: XCTestCase {
         Calendar.current.date(from: DateComponents(year: year, month: month, day: day))!
     }
 
+    // MARK: - defaultNewAthleteDateOfBirth
+
+    func testDefaultNewAthleteDateOfBirthIsAU12NotNA() {
+        let now = date(year: 2026, month: 10, day: 29)
+        let dob = SeasonContext.defaultNewAthleteDateOfBirth(referenceDate: now)
+        XCTAssertEqual(dob, date(year: 2014, month: 1, day: 1))
+        XCTAssertEqual(SeasonContext.ageCategory(for: dob, inYear: 2026), "U12")
+    }
+
     private func date(year: Int, month: Int, day: Int) -> Date {
         Calendar.current.date(from: DateComponents(year: year, month: month, day: day))!
     }

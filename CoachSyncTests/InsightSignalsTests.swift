@@ -136,7 +136,123 @@ final class InsightSignalsTests: XCTestCase {
         XCTAssertNil(athlete.decliningBlockName)
     }
 
+    func testRegressedBlockName_singleSessionRepFadeIsNotATrend() throws {
+        // The slope is fitted over one mean per session, so a single 3-rep session — where
+        // within-session fatigue and arbitrary rep order dominate — is not a trend.
+        let context = try TestSupport.makeInMemoryContext()
+        let athlete = Athlete(firstName: "A", lastName: "B", dateOfBirth: Date(timeIntervalSince1970: 0))
+        context.insert(athlete)
+        addPacingBlock(name: "3 × 500m", repTimes: [120_000, 124_000, 128_000],
+                       date: Date(timeIntervalSince1970: 1_700_000_000), athlete: athlete, context: context)
+        try context.save()
+
+        XCTAssertTrue(athlete.decliningBlockName == nil && athlete.mostImprovedBlockName == nil,
+                      "One session is not a trend")
+    }
+
+    // MARK: - Shared fixture (also run by the backend's AthleteSignalsFixtureTest)
+
+    func testSharedFixtureCases() throws {
+        let url = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+            .appendingPathComponent("shared/fixtures/athlete-signals.json")
+        let fixture = try JSONDecoder().decode(SignalsFixture.self, from: Data(contentsOf: url))
+        XCTAssertFalse(fixture.cases.isEmpty)
+        let base = Date(timeIntervalSince1970: 1_767_225_600)   // 2026-01-01, matching the backend
+
+        for testCase in fixture.cases {
+            let context = try TestSupport.makeInMemoryContext()
+            let athlete = Athlete(firstName: "A", lastName: "B", dateOfBirth: Date(timeIntervalSince1970: 0))
+            context.insert(athlete)
+            for session in testCase.sessions {
+                addPacingBlock(name: session.block, repTimes: session.reps,
+                               date: base + Double(session.day) * 86_400, athlete: athlete, context: context)
+            }
+            try context.save()
+
+            let expected = testCase.expected
+            XCTAssertEqual(athlete.decliningBlockName, expected.decliningBlock, testCase.name)
+            XCTAssertEqual(athlete.mostImprovedBlockName, expected.mostImprovedBlock, testCase.name)
+            XCTAssertEqual(athlete.inconsistentPacingBlock?.name, expected.inconsistentPacing?.blockName, testCase.name)
+            XCTAssertEqual(athlete.inconsistentPacingBlock?.cvPercent, expected.inconsistentPacing?.cvPercent, testCase.name)
+        }
+    }
+
+    private struct SignalsFixture: Decodable {
+        struct Session: Decodable { let day: Int; let block: String; let reps: [Int] }
+        struct Pacing: Decodable { let blockName: String; let cvPercent: Int }
+        struct Expected: Decodable {
+            let decliningBlock: String?
+            let mostImprovedBlock: String?
+            let inconsistentPacing: Pacing?
+        }
+        struct Case: Decodable { let name: String; let sessions: [Session]; let expected: Expected }
+        let cases: [Case]
+    }
+
+    func testRegressedBlockName_prefersMostRecentlyTrainedBlock() throws {
+        // Two blocks both trending slower — the one trained most recently wins.
+        let context = try TestSupport.makeInMemoryContext()
+        let athlete = Athlete(firstName: "A", lastName: "B", dateOfBirth: Date(timeIntervalSince1970: 0))
+        context.insert(athlete)
+        let base = Date(timeIntervalSince1970: 1_700_000_000)
+        let day: TimeInterval = 86_400
+        for (i, time) in [120_000, 124_000, 128_000].enumerated() {
+            addTimedBlock(name: "500m TT", time: time, date: base + Double(i) * day,
+                          athlete: athlete, context: context)
+            addTimedBlock(name: "200m TT", time: time / 3, date: base + Double(i + 5) * day,
+                          athlete: athlete, context: context)
+        }
+        try context.save()
+
+        XCTAssertEqual(athlete.decliningBlockName, "200m TT")
+    }
+
+    func testRegressedBlockName_flatTrendBelowThresholdIsSilent() throws {
+        // 20 ms/session drift is inside the ±50 ms dead band — neither signal fires.
+        let context = try TestSupport.makeInMemoryContext()
+        let athlete = Athlete(firstName: "A", lastName: "B", dateOfBirth: Date(timeIntervalSince1970: 0))
+        context.insert(athlete)
+        let base = Date(timeIntervalSince1970: 1_700_000_000)
+        for (i, time) in [120_000, 120_020, 120_040].enumerated() {
+            addTimedBlock(name: "500m TT", time: time, date: base + Double(i) * 86_400,
+                          athlete: athlete, context: context)
+        }
+        try context.save()
+
+        XCTAssertNil(athlete.decliningBlockName)
+        XCTAssertNil(athlete.mostImprovedBlockName)
+    }
+
     // MARK: - Athlete.inconsistentPacingBlock
+
+    func testInconsistentPacingBlock_singleSessionIsNotEnough() throws {
+        // CV is averaged across sessions and needs `minPointsForCV` of them; one erratic
+        // session alone must not flag the athlete.
+        let context = try TestSupport.makeInMemoryContext()
+        let athlete = Athlete(firstName: "A", lastName: "B", dateOfBirth: Date(timeIntervalSince1970: 0))
+        context.insert(athlete)
+        addPacingBlock(name: "Pyramid", repTimes: [100_000, 140_000, 100_000, 140_000],
+                       date: Date(timeIntervalSince1970: 1_700_000_000), athlete: athlete, context: context)
+        try context.save()
+
+        XCTAssertNil(athlete.inconsistentPacingBlock)
+    }
+
+    func testInconsistentPacingBlock_reportsRoundedCVPercent() throws {
+        // Reps alternating 100 s / 140 s: mean 120 s, population stddev 20 s → CV 16.7% → 17.
+        let context = try TestSupport.makeInMemoryContext()
+        let athlete = Athlete(firstName: "A", lastName: "B", dateOfBirth: Date(timeIntervalSince1970: 0))
+        context.insert(athlete)
+        let base = Date(timeIntervalSince1970: 1_700_000_000)
+        for offset in 0..<2 {
+            addPacingBlock(name: "Pyramid", repTimes: [100_000, 140_000, 100_000, 140_000],
+                           date: base + Double(offset) * 86_400, athlete: athlete, context: context)
+        }
+        try context.save()
+
+        XCTAssertEqual(athlete.inconsistentPacingBlock?.cvPercent, 17)
+    }
 
     func testInconsistentPacingBlock_flagsHighRepVariance() throws {
         let context = try TestSupport.makeInMemoryContext()

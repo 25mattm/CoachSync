@@ -38,6 +38,69 @@ final class CSVParserTests: XCTestCase {
         XCTAssertEqual(result.athletes.first?.gender, .female)
     }
 
+    func testQuotedCommaAndEscapedQuoteStayInOneField() {
+        let csv = header + "Ava,Smith,01/02/2015,\"Smith, Jane \"\"JJ\"\"\",555-0100,,F\n"
+        let result = CSVParser.parse(csv)
+        XCTAssertEqual(result.errors, [])
+        XCTAssertEqual(result.athletes.first?.guardianName, "Smith, Jane \"JJ\"")
+        XCTAssertEqual(result.athletes.first?.guardianPhone, "555-0100")
+    }
+
+    func testCRLFLineEndingsAndBlankLinesAreTolerated() {
+        let csv = "FirstName,LastName,DateOfBirth\r\nAva,Smith,01/02/2015\r\n\r\nLiam,Brown,03/14/2016\r\n"
+        let result = CSVParser.parse(csv)
+        XCTAssertEqual(result.errors, [])
+        XCTAssertEqual(result.athletes.map(\.fullName), ["Ava Smith", "Liam Brown"])
+    }
+
+    func testHeaderOnlyFileIsAnError() {
+        let result = CSVParser.parse(header)
+        XCTAssertTrue(result.athletes.isEmpty)
+        XCTAssertEqual(result.errors, ["File is empty or has only a header row."])
+    }
+
+    func testInvalidRowsAreSkippedWithNumberedErrors() {
+        let csv = header
+            + "Ava,Smith\n"                 // row 2: too few columns
+            + " ,Smith,01/02/2015\n"        // row 3: blank first name
+            + "Ava, ,01/02/2015\n"          // row 4: blank last name
+            + "Ava,Smith,2015-01-02\n"      // row 5: wrong date format
+            + "Ava,Smith,01/02/2999\n"      // row 6: future date
+            + "Liam,Brown,03/14/2016\n"     // row 7: valid
+        let result = CSVParser.parse(csv)
+        XCTAssertEqual(result.athletes.map(\.fullName), ["Liam Brown"])
+        XCTAssertEqual(result.errors.count, 5)
+        for (offset, error) in result.errors.enumerated() {
+            XCTAssertTrue(error.hasPrefix("Row \(offset + 2):"), error)
+        }
+        XCTAssertTrue(result.errors[1].contains("First name"), result.errors[1])
+        XCTAssertTrue(result.errors[2].contains("Last name"), result.errors[2])
+        XCTAssertTrue(result.errors[4].contains("future"), result.errors[4])
+    }
+
+    func testRowNumbersCountBlankLines() {
+        // Error rows match the spreadsheet: blank lines are skipped but still counted.
+        let result = CSVParser.parse(header + "\nAva,Smith\n")
+        XCTAssertEqual(result.errors.first?.hasPrefix("Row 3:"), true, result.errors.first ?? "")
+    }
+
+    func testRowNumbersCountAQuotedMultiLineRecordAsOneRow() {
+        let csv = header + "Ava,Smith,01/02/2015,\"Jane\nSmith\"\nLiam,Brown\n"
+        let result = CSVParser.parse(csv)
+        XCTAssertEqual(result.errors.first?.hasPrefix("Row 3:"), true, result.errors.first ?? "")
+    }
+
+    func testGenderParsingIsCaseInsensitiveAndOptional() {
+        let csv = header
+            + "A,One,01/02/2015,,,,Male\n"
+            + "B,Two,01/02/2015,,,,girl\n"
+            + "C,Three,01/02/2015,,,,M\n"
+            + "D,Four,01/02/2015,,,,nonbinary\n"
+            + "E,Five,01/02/2015\n"
+        let genders = CSVParser.parse(csv).athletes.map(\.gender)
+        XCTAssertEqual(genders, [.male, .female, .male, nil, nil])
+    }
+
     // MARK: - Dates
 
     func testTwoDigitYearIsRejectedNotImportedAsYearZeroZeroXX() {

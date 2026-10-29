@@ -532,18 +532,21 @@ struct CSVParser {
     static func parse(_ content: String) -> CSVParseResult {
         var result = CSVParseResult()
 
+        // Blank records are skipped, but each keeps its 1-based position in the file so error
+        // messages name the row the coach sees in their spreadsheet.
         let lines = splitRecords(content
             .replacingOccurrences(of: "\r\n", with: "\n")
             .replacingOccurrences(of: "\r", with: "\n"))
-            .filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }
+            .enumerated()
+            .map { (rowNumber: $0.offset + 1, text: $0.element) }
+            .filter { !$0.text.trimmingCharacters(in: .whitespaces).isEmpty }
 
         guard lines.count > 1 else {
             result.errors.append("File is empty or has only a header row.")
             return result
         }
 
-        for (index, line) in lines.dropFirst().enumerated() {
-            let rowNumber = index + 2
+        for (rowNumber, line) in lines.dropFirst() {
             let fields = parseCSVLine(line)
 
             guard fields.count >= 3 else {

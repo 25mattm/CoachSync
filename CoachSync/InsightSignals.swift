@@ -195,25 +195,36 @@ extension Athlete {
     /// Shared helper: find the most recently trained block whose slope
     /// passes the supplied predicate. Used by both decliningBlockName and
     /// mostImprovedBlockName.
+    ///
+    /// One point per session-block (the mean of that day's reps), so within-session
+    /// fatigue and arbitrary rep order can't masquerade as a trend. Mirrored by the
+    /// backend's `AthleteSignalsService`; both run `shared/fixtures/athlete-signals.json`.
     fileprivate func regressedBlockName(slopeMatches: (Double) -> Bool) -> String? {
         let valid = Self.recentWindow(performanceRecords ?? []).filter {
-            $0.status == .complete && $0.recordedTimeMs != nil
+            $0.status == .complete && $0.recordedTimeMs != nil && $0.sessionBlock != nil
         }
-        let grouped = Dictionary(grouping: valid) {
-            $0.sessionBlock?.blockName ?? "Unknown"
+        struct SessionPoint {
+            let blockName: String
+            let date: Date
+            let meanMs: Double
         }
-
-        let matched: [(name: String, mostRecent: Date)] = grouped.compactMap { name, records in
-            guard records.count >= InsightThresholds.minPointsForRegression else { return nil }
-            let sorted = records.sorted {
-                ($0.sessionBlock?.session?.scheduledDate ?? .distantPast)
-                    < ($1.sessionBlock?.session?.scheduledDate ?? .distantPast)
+        let points: [SessionPoint] = Dictionary(grouping: valid) { $0.sessionBlock!.id }
+            .values.compactMap { records in
+                let times = records.compactMap(\.recordedTimeMs).map(Double.init)
+                guard let block = records.first?.sessionBlock, !times.isEmpty else { return nil }
+                return SessionPoint(blockName: block.blockName,
+                                    date: block.session?.scheduledDate ?? .distantPast,
+                                    meanMs: times.reduce(0, +) / Double(times.count))
             }
-            let times = sorted.compactMap(\.recordedTimeMs).map(Double.init)
-            guard let slope = leastSquaresSlope(times),
-                  slopeMatches(slope) else { return nil }
-            return (name, sorted.last?.sessionBlock?.session?.scheduledDate ?? .distantPast)
-        }
+
+        let matched: [(name: String, mostRecent: Date)] = Dictionary(grouping: points, by: \.blockName)
+            .compactMap { name, sessions in
+                guard sessions.count >= InsightThresholds.minPointsForRegression else { return nil }
+                let sorted = sessions.sorted { $0.date < $1.date }
+                guard let slope = leastSquaresSlope(sorted.map(\.meanMs)),
+                      slopeMatches(slope) else { return nil }
+                return (name, sorted.last?.date ?? .distantPast)
+            }
         return matched.max { $0.mostRecent < $1.mostRecent }?.name
     }
 

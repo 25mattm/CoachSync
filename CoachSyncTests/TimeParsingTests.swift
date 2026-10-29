@@ -30,6 +30,47 @@ final class TimeParsingTests: XCTestCase {
         XCTAssertNil(parseTimeToMs("1:02:99:000"))   // second out of range (4-part form)
     }
 
+    func testParsesSingleDigitSecondsAndLongMinuteCounts() {
+        XCTAssertEqual(parseTimeToMs("1:5"), 65_000)          // "1:5" reads as 1:05
+        XCTAssertEqual(parseTimeToMs("75:00.0"), 4_500_000)   // minutes are unbounded in M:SS form
+        XCTAssertEqual(parseTimeToMs("0.5"), 500)
+    }
+
+    func testRejectsMalformedSeparators() {
+        XCTAssertNil(parseTimeToMs("1:05."))       // trailing dot, empty fraction
+        XCTAssertNil(parseTimeToMs("1.05.2"))      // two dots
+        XCTAssertNil(parseTimeToMs("1:2:3:4:5"))   // too many colons
+        XCTAssertNil(parseTimeToMs("1:05.2a"))
+        XCTAssertNil(parseTimeToMs(":05"))
+    }
+
+    func testBareSecondsWithFractionAbove59() {
+        // Bare seconds have no minutes part, so "65.5" is as valid as "65" (a 400m split).
+        // The 0–59 cap still applies once there is a minutes part.
+        XCTAssertEqual(parseTimeToMs("65"), 65_000)
+        XCTAssertEqual(parseTimeToMs("65.5"), 65_500)
+        XCTAssertEqual(parseTimeToMs("125.25"), 125_250)
+        XCTAssertNil(parseTimeToMs("-1.5"))
+        XCTAssertNil(parseTimeToMs("1:65.5"))
+    }
+
+    func testLoggableEntryText() {
+        XCTAssertTrue(isLoggableEntryText("1:30"))
+        XCTAssertTrue(isLoggableEntryText(" dns "))
+        XCTAssertTrue(isLoggableEntryText("Dnf"))
+        XCTAssertFalse(isLoggableEntryText(""))
+        XCTAssertFalse(isLoggableEntryText("   "))
+        XCTAssertFalse(isLoggableEntryText("DN"))
+        XCTAssertFalse(isLoggableEntryText("1:75"))
+    }
+
+    func testZeroTimeIsNotLoggable() {
+        // `saveEntry` rejects a zero time, so the "fully logged" checks must too.
+        XCTAssertFalse(isLoggableEntryText("0"))
+        XCTAssertFalse(isLoggableEntryText("0:00.00"))
+        XCTAssertTrue(isLoggableEntryText("0.01"))
+    }
+
     func testFormatsMillisecondsForDisplay() {
         XCTAssertEqual(formatMillisecondsForDisplay(65_230), "1:05.23")
         XCTAssertEqual(formatMillisecondsForDisplay(3_723_450), "1:02:03.45")

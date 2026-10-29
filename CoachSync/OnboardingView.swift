@@ -183,6 +183,8 @@ struct OnboardingView: View {
     @State private var joinCode = ""
     @State private var joinStatusMessage: String?
     @State private var isSubmittingJoinCode = false
+    @State private var showSaveError = false
+    @State private var saveErrorMessage = ""
 
     var body: some View {
         NavigationStack {
@@ -194,7 +196,9 @@ struct OnboardingView: View {
                 case .coach:             coachStep
                 }
             }
-            .navigationTitle("Welcome")
+            // The sign-in step has its own "Welcome to CoachSync" heading; a second title there
+            // repeated it and reserved large-title space that pushed the content down.
+            .navigationTitle(step == .signIn ? "" : "Welcome")
             .frame(maxWidth: 640)
             .frame(maxWidth: .infinity)
         }
@@ -203,6 +207,11 @@ struct OnboardingView: View {
             step = initialStep
         }
         .onChange(of: auth.state) { _, _ in advanceIfSignedIn() }
+        .alert("Couldn't Create Profile", isPresented: $showSaveError) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(saveErrorMessage)
+        }
     }
 
     /// Where to start: a coach who's already signed in (e.g. relaunching mid-onboarding, or a
@@ -480,7 +489,16 @@ struct OnboardingView: View {
             nccpLevel: nccpLevel.isEmpty ? nil : nccpLevel
         )
         modelContext.insert(coach)
-        try? SyncStore.save(modelContext)
+        do {
+            try SyncStore.save(modelContext)
+        } catch {
+            // Selecting an unsaved coach would let onboarding finish with a profile that
+            // vanishes on relaunch; discard it and keep the coach on this step to retry.
+            modelContext.rollback()
+            saveErrorMessage = error.localizedDescription
+            showSaveError = true
+            return
+        }
         select(coach)
     }
 

@@ -12,7 +12,7 @@ final class CoachSyncUITestsLaunch: CoachSyncUITestCase {
     /// ran against the developer's *real* persistent store — and, with a session in the Keychain,
     /// against the live backend. It now inherits the in-memory seeded harness.
     func testLaunch() throws {
-        XCTAssertTrue(app.tabBars.buttons["tab.home"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.tab(.home).waitForExistence(timeout: 10))
     }
 
     /// A UI-test launch must never restore the developer's real, persisted backend session.
@@ -28,7 +28,7 @@ final class CoachSyncUITestsLaunch: CoachSyncUITestCase {
     /// no-ops under `AppEnvironment.isUITesting` regardless of the session, so this fake session
     /// exposes no path to the live backend even though "Sync Now" is now visible.
     func testUITestingLaunchDoesNotRestoreBackendSession() throws {
-        app.tabBars.buttons["tab.settings"].tap()
+        app.tab(.settings).tap()
         XCTAssertTrue(app.navigationBars["Settings"].waitForExistence(timeout: 2))
 
         XCTAssertTrue(app.staticTexts["UI Test Coach"].waitForExistence(timeout: 2),

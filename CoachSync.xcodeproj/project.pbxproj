@@ -26,6 +26,8 @@
 		C0DEC0DE0000000000000071 /* WeatherLogicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DEC0DE0000000000000070 /* WeatherLogicTests.swift */; };
 		EA9AFB5D501D99021BE37ED8 /* AthleteCRUDUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 706CC47037B5657FBD146DAD /* AthleteCRUDUITests.swift */; };
 		FC14CD2B9B43619299A34AB6 /* SessionLoggingUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FE37D632C4EA833E6184165 /* SessionLoggingUITests.swift */; };
+		C0DEC0DE00000000000000A1 /* VisualTourUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DEC0DE00000000000000A0 /* VisualTourUITests.swift */; };
+		C0DEC0DE00000000000000B1 /* StringHelpersTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DEC0DE00000000000000B0 /* StringHelpersTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -69,6 +71,8 @@
 		C0DEC0DE0000000000000060 /* NeedsAttentionSortTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NeedsAttentionSortTests.swift; sourceTree = "<group>"; };
 		C0DEC0DE0000000000000070 /* WeatherLogicTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherLogicTests.swift; sourceTree = "<group>"; };
 		C6C97A233A9DDE6EC90042E2 /* LoadRulesTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LoadRulesTests.swift; sourceTree = "<group>"; };
+		C0DEC0DE00000000000000A0 /* VisualTourUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VisualTourUITests.swift; sourceTree = "<group>"; };
+		C0DEC0DE00000000000000B0 /* StringHelpersTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringHelpersTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -187,6 +191,7 @@
 				C6C97A233A9DDE6EC90042E2 /* LoadRulesTests.swift */,
 				A5D741E28A9614381BE6EC64 /* LocalWipeTests.swift */,
 				1DB5181B4421706320C4C21C /* CSVParserTests.swift */,
+				C0DEC0DE00000000000000B0 /* StringHelpersTests.swift */,
 			);
 			path = CoachSyncTests;
 			sourceTree = "<group>";
@@ -200,6 +205,7 @@
 				706CC47037B5657FBD146DAD /* AthleteCRUDUITests.swift */,
 				2E185CA6FB914D3A288B712D /* SessionSheetUITests.swift */,
 				3FE37D632C4EA833E6184165 /* SessionLoggingUITests.swift */,
+				C0DEC0DE00000000000000A0 /* VisualTourUITests.swift */,
 			);
 			name = CoachSyncUITests;
 			path = CoachSyncUITests;
@@ -388,6 +394,7 @@
 				EA9AFB5D501D99021BE37ED8 /* AthleteCRUDUITests.swift in Sources */,
 				76D1EA07BA684F1369FC43C4 /* SessionSheetUITests.swift in Sources */,
 				FC14CD2B9B43619299A34AB6 /* SessionLoggingUITests.swift in Sources */,
+				C0DEC0DE00000000000000A1 /* VisualTourUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -408,6 +415,7 @@
 				65DB875ADFA4402B06096C3B /* LoadRulesTests.swift in Sources */,
 				4DE2B452DC43913E882E2C01 /* LocalWipeTests.swift in Sources */,
 				1DB2069BD72AF450C94F45F9 /* CSVParserTests.swift in Sources */,
+				C0DEC0DE00000000000000B1 /* StringHelpersTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

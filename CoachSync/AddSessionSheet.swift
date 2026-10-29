@@ -131,7 +131,7 @@ struct AddSessionSheet: View {
             Self.unregisterPendingDraft(session.id)
         }
         if !leaked.isEmpty {
-            try? SyncStore.save(modelContext)
+            SyncStore.saveLoggingFailure(modelContext, "Leaked draft sweep")
         }
 
         // Prune registry entries whose session no longer exists (deleted on
@@ -151,7 +151,7 @@ struct AddSessionSheet: View {
         guard !hasBeenSaved, let session = draftSession else { return }
         Self.unregisterPendingDraft(session.id)
         modelContext.deleteSessionCascade(session)
-        try? SyncStore.save(modelContext)
+        SyncStore.saveLoggingFailure(modelContext, "Draft session cleanup")
     }
 
     // MARK: - Save

@@ -1,0 +1,67 @@
+# Runs on every push and pull request: the swallowed-save check, the backend test suite,
+# the iOS unit tests (including the shared signal fixtures), and a macOS build.
+# UI tests and the visual tour are slower and run nightly instead (nightly-ui.yml).
+name: CI
+
+on:
+  push:
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Static checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: No swallowed save errors
+        run: scripts/check-swallowed-saves.sh
+
+  backend:
+    name: Backend tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+      # Tests run against in-memory H2 (src/test/resources/application.properties).
+      # AthleteSignalsFixtureTest reads ../shared/fixtures, so the full checkout is needed.
+      - name: Test
+        run: ./mvnw -B test
+
+  ios:
+    name: iOS unit tests + macOS build
+    # The deployment target is iOS/macOS 26.4, so this needs a runner image with Xcode 26.4+.
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+      - name: Xcode version
+        run: xcodebuild -version
+      - name: Unit tests
+        run: |
+          xcodebuild test \
+            -project CoachSync.xcodeproj -scheme CoachSync \
+            -destination 'platform=iOS Simulator,name=iPhone 17' \
+            -only-testing:CoachSyncTests \
+            -resultBundlePath build/unit-tests.xcresult
+      - name: macOS build
+        run: |
+          xcodebuild build \
+            -project CoachSync.xcodeproj -scheme CoachSyncMac \
+            -destination 'platform=macOS' \
+            CODE_SIGNING_ALLOWED=NO
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-tests-xcresult
+          path: build/unit-tests.xcresult

@@ -10,39 +10,36 @@ struct ContentView: View {
     @State private var selectedTab = 0
 
     var body: some View {
+        // UI tests find tabs by label (`XCUIApplication.tab(_:)`): identifiers set inside
+        // `.tabItem` don't reliably reach the tab bar buttons, so none are set here.
         TabView(selection: $selectedTab) {
             DashboardView(onShowSchedule: { selectedTab = 3 })
                 .tabItem {
                     Label("Home", systemImage: "house.fill")
-                        .accessibilityIdentifier("tab.home")
                 }
                 .tag(0)
 
             AthletesView()
                 .tabItem {
                     Label("Athletes", systemImage: "person.2.fill")
-                        .accessibilityIdentifier("tab.athletes")
                 }
                 .tag(1)
 
             TeamsView()
                 .tabItem {
                     Label("Teams", systemImage: "person.3.fill")
-                        .accessibilityIdentifier("tab.teams")
                 }
                 .tag(2)
 
             ScheduleView()
                 .tabItem {
                     Label("Schedule", systemImage: "calendar")
-                        .accessibilityIdentifier("tab.schedule")
                 }
                 .tag(3)
 
             SettingsView()
                 .tabItem {
                     Label("Settings", systemImage: "gearshape.fill")
-                        .accessibilityIdentifier("tab.settings")
                 }
                 .tag(4)
         }

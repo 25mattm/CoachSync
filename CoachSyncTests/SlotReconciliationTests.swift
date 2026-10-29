@@ -251,4 +251,29 @@ final class SlotReconciliationTests: XCTestCase {
         XCTAssertEqual(tracking.count + nonTracking.count, BlockType.allCases.count,
                        "Truth table covers every BlockType case")
     }
+
+    // MARK: - BlockSummaryRow.recordedCount (the Summary's "N/M recorded")
+
+    func testRecordedCount_ignoresPendingSlots() throws {
+        // The logger creates pending slots for every present athlete on entering a
+        // block; only a time, DNS, or DNF counts toward the Summary's "N/M recorded".
+        let (context, block, logged) = try makeContextAndBlock(reps: 1)
+        let unlogged = Athlete(firstName: "No", lastName: "Time",
+                               dateOfBirth: Date(timeIntervalSince1970: 0))
+        context.insert(unlogged)
+        addSlot(context, block: block, athlete: logged, rep: 1, timeMs: 245_300, status: .complete)
+        addSlot(context, block: block, athlete: unlogged, rep: 1)
+        try context.save()
+
+        let row = BlockSummaryRow(block: block, presentCount: 2)
+        XCTAssertEqual(row.recordedCount, 1)
+
+        let dns = Athlete(firstName: "Did", lastName: "NotStart",
+                          dateOfBirth: Date(timeIntervalSince1970: 0))
+        context.insert(dns)
+        addSlot(context, block: block, athlete: dns, rep: 1, status: .dns)
+        try context.save()
+        XCTAssertEqual(BlockSummaryRow(block: block, presentCount: 3).recordedCount, 2,
+                       "DNS is a deliberate outcome and counts as recorded")
+    }
 }
