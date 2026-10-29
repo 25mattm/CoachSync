@@ -65,7 +65,7 @@ struct AthleteProfileView: View {
                 .padding(16)
             }
         }
-        .navigationTitle(athlete.firstName)
+        .navigationTitle(athlete.fullName)
 #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
 #endif

@@ -521,6 +521,8 @@ struct CoachEditSheet: View {
     @State private var confirmingDelete = false
     @State private var showDeleteError = false
     @State private var deleteErrorMessage = ""
+    @State private var showSaveError = false
+    @State private var saveErrorMessage = ""
 
     private var trimmedName: String { name.trimmingCharacters(in: .whitespaces) }
 
@@ -580,6 +582,11 @@ struct CoachEditSheet: View {
             } message: {
                 Text(deleteErrorMessage)
             }
+            .alert("Couldn't Save Coach", isPresented: $showSaveError) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text(saveErrorMessage)
+            }
 #if os(macOS)
             .frame(minWidth: 420, minHeight: 320)
 #endif
@@ -599,11 +606,6 @@ struct CoachEditSheet: View {
             coach.name = trimmedName
             coach.role = trimmedRole.isEmpty ? nil : trimmedRole
             coach.nccpLevel = nccpLevel.isEmpty ? nil : nccpLevel
-            // Keep the device's current-coach name snapshot in sync when editing
-            // the active coach, so future "logged by" tags use the new name.
-            if CoachIdentity.currentID == coach.id.uuidString {
-                CoachIdentity.setCurrent(coach)
-            }
         } else {
             let new = Coach(
                 name: trimmedName,
@@ -612,7 +614,20 @@ struct CoachEditSheet: View {
             )
             modelContext.insert(new)
         }
-        try? SyncStore.save(modelContext)
+        do {
+            try SyncStore.save(modelContext)
+        } catch {
+            // Undo the in-memory edit/insert; the form keeps the typed values for a retry.
+            modelContext.rollback()
+            saveErrorMessage = error.localizedDescription
+            showSaveError = true
+            return
+        }
+        // Keep the device's current-coach name snapshot in sync when editing
+        // the active coach, so future "logged by" tags use the new name.
+        if let coach, CoachIdentity.currentID == coach.id.uuidString {
+            CoachIdentity.setCurrent(coach)
+        }
         dismiss()
     }
 

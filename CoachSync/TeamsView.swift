@@ -244,23 +244,13 @@ struct TeamDetailView: View {
     var body: some View {
         List {
             Section {
-                HStack(spacing: 32) {
-                    VStack(spacing: 4) {
-                        Text("\(activeMembers.count)")
-                            .font(.title2).fontWeight(.bold).foregroundStyle(Color.accentColor)
-                        Text("Athletes").font(.caption).foregroundStyle(.secondary)
-                    }
-                    VStack(spacing: 4) {
-                        Text("\((team.sessions ?? []).filter { $0.status == .completed }.count)")
-                            .font(.title2).fontWeight(.bold).foregroundStyle(.green)
-                        Text("Practices").font(.caption).foregroundStyle(.secondary)
-                    }
-                    VStack(spacing: 4) {
-                        Text(team.createdAt.formatted(.dateTime.month(.abbreviated).year()))
-                            .font(.subheadline).fontWeight(.bold).foregroundStyle(.secondary)
-                        Text("Created").font(.caption).foregroundStyle(.secondary)
-                    }
-                }
+                StatStrip(items: [
+                    StatStripItem(value: "\(activeMembers.count)", label: "Athletes", color: .accentColor),
+                    StatStripItem(value: "\((team.sessions ?? []).filter { $0.status == .completed }.count)",
+                             label: "Practices", color: .green),
+                    StatStripItem(value: team.createdAt.formatted(.dateTime.month(.abbreviated).year()),
+                             label: "Created", color: .secondary, valueFont: .subheadline)
+                ])
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 8)
             }

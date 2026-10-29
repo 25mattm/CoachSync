@@ -93,7 +93,8 @@ func parseTimeToMs(_ input: String) -> Int? {
             return ((hours * 3600) + (minutes * 60) + seconds) * 1000 + milliseconds
         }
     } else if s.contains(".") {
-        guard let (seconds, milliseconds) = parseSecondsComponent(s) else { return nil }
+        // Bare seconds have no minutes part to carry into, so (like bare "65") they aren't capped at 59.
+        guard let (seconds, milliseconds) = parseSecondsComponent(s, capsAt59: false) else { return nil }
         return seconds * 1000 + milliseconds
     } else if let seconds = Int(s), seconds >= 0 {
         return seconds * 1000
@@ -102,10 +103,11 @@ func parseTimeToMs(_ input: String) -> Int? {
 }
 
 /// Parses the seconds component and normalizes 1-3 fractional digits into milliseconds.
-private func parseSecondsComponent(_ input: String) -> (seconds: Int, milliseconds: Int)? {
+/// `capsAt59` is false only for a bare seconds value with no minutes part.
+private func parseSecondsComponent(_ input: String, capsAt59: Bool = true) -> (seconds: Int, milliseconds: Int)? {
     let parts = input.components(separatedBy: ".")
     guard parts.count <= 2, let wholeSeconds = Int(parts[0]) else { return nil }
-    guard (0..<60).contains(wholeSeconds) else { return nil }
+    guard wholeSeconds >= 0, !capsAt59 || wholeSeconds < 60 else { return nil }
 
     let milliseconds: Int
     if let fractionalPart = parts.dropFirst().first {

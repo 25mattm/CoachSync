@@ -239,11 +239,13 @@ struct AddAthleteSheet: View {
 
     @State private var firstName = ""
     @State private var lastName = ""
-    @State private var dateOfBirth = Date()
+    @State private var dateOfBirth = SeasonContext.defaultNewAthleteDateOfBirth()
     @State private var gender: Gender? = nil
     @State private var guardianName = ""
     @State private var guardianPhone = ""
     @State private var guardianEmail = ""
+    @State private var showSaveError = false
+    @State private var saveErrorMessage = ""
 
     private var previewCategory: String {
         SeasonContext.ageCategory(for: dateOfBirth)
@@ -327,6 +329,11 @@ struct AddAthleteSheet: View {
                         .accessibilityIdentifier("athlete.saveButton")
                 }
             }
+            .alert("Save Error", isPresented: $showSaveError) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(saveErrorMessage)
+            }
         }
     }
 
@@ -345,7 +352,14 @@ struct AddAthleteSheet: View {
         // Commit through the sync chokepoint, not a bare autosave: this enqueues the outbox entry so
         // the athlete pushes to the backend. Without it the record persists locally but never syncs,
         // and the pull's snapshot-diff then deletes it as "absent from the server."
-        try? SyncStore.save(modelContext)
-        dismiss()
+        do {
+            try SyncStore.save(modelContext)
+            dismiss()
+        } catch {
+            // Discard the unsaved insert so tapping Save again doesn't add a duplicate athlete.
+            modelContext.rollback()
+            saveErrorMessage = error.localizedDescription
+            showSaveError = true
+        }
     }
 }

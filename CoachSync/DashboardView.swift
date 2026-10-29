@@ -20,6 +20,7 @@ struct DashboardView: View {
     @State private var weather = WeatherManager()
     @Environment(\.scenePhase) private var scenePhase
 #endif
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     /// Host-provided navigation to the Schedule surface — the iOS TabView and
     /// the Mac sidebar switch differently, so the chip calls back instead of
@@ -31,6 +32,12 @@ struct DashboardView: View {
         activeSessions.filter {
             Calendar.current.isDateInToday($0.scheduledDate) && $0.status.isOpen
         }
+    }
+
+    /// Today's practices already marked completed. When there are some and nothing is left
+    /// open, the empty card says "all done" rather than "no practices scheduled".
+    private var completedTodayCount: Int {
+        completedSessions.filter { Calendar.current.isDateInToday($0.scheduledDate) }.count
     }
 
     /// Open sessions dated after today — shown in the horizontal Upcoming scroller.
@@ -79,8 +86,13 @@ struct DashboardView: View {
                         // Tap target, not just an empty state — matches the
                         // "Add Practice on This Day" pattern on Schedule.
                         Button { showingAddSession = true } label: {
-                            EmptyCard(message: "No practices scheduled for today — tap to add one",
-                                      systemImage: "calendar.badge.plus")
+                            if completedTodayCount > 0 {
+                                EmptyCard(message: "All done for today — tap to add another practice",
+                                          systemImage: "checkmark.circle")
+                            } else {
+                                EmptyCard(message: "No practices scheduled for today — tap to add one",
+                                          systemImage: "calendar.badge.plus")
+                            }
                         }
                         .buttonStyle(.plain)
                     } else {
@@ -170,8 +182,12 @@ struct DashboardView: View {
                 .animation(didAppear ? .snappy(duration: 0.2) : nil, value: activeSessions)
                 .padding(16)
             }
+            // Large titles can't wrap, so accessibility sizes get "Thu, Oct 29" instead of
+            // a truncated "Thursday, Oct…".
             .navigationTitle(
-                Date.now.formatted(.dateTime.weekday(.wide).month().day())
+                Date.now.formatted(.dateTime
+                    .weekday(dynamicTypeSize.isAccessibilitySize ? .abbreviated : .wide)
+                    .month().day())
             )
             .toolbar {
                 ToolbarItem(placement: .automatic) {

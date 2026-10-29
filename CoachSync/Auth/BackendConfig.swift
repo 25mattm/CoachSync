@@ -6,9 +6,10 @@ import Foundation
 /// (so a scheme/build can point at a deployed backend), otherwise defaults to the local
 /// dev backend on the simulator's host. Production will set the key to an HTTPS URL.
 ///
-/// `Info.plist`'s `CoachSyncBackendURL` is committed pointing at the production backend (there's
-/// no per-configuration override anywhere in the Xcode project), so an ordinary Debug run would
-/// otherwise talk to production. Debug builds ignore that key entirely and always use
+/// `Info.plist`'s `CoachSyncBackendURL` is committed as `http://localhost:8080` (there's no
+/// per-configuration override anywhere in the Xcode project), so Release builds — TestFlight and
+/// App Store included — use localhost until that key is set to the deployed HTTPS backend.
+/// Debug builds ignore the key entirely and always use
 /// `defaultBaseURL` — a developer pointing a Debug build at a real deployed backend can set the
 /// `COACHSYNC_BACKEND_URL_OVERRIDE` environment variable on the run scheme instead.
 // `nonisolated` (the module defaults to MainActor isolation): this is pure, thread-safe

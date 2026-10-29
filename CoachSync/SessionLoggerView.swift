@@ -217,7 +217,7 @@ struct SessionLoggerView: View {
             }
         }
         if didChange {
-            try? SyncStore.save(modelContext)
+            SyncStore.saveLoggingFailure(modelContext, "Performance slot backfill")
         }
     }
 
@@ -287,15 +287,18 @@ struct SessionLoggerView: View {
         }
     }
 
-    /// Mark the session as completed, stamp end time, save, and dismiss the logger.
+    /// Mark the session as completed, save, and dismiss the logger. On a failed save the
+    /// status is restored so the session doesn't read as completed while unsaved.
     private func completeSession() {
         isCompleting = true
         Task { @MainActor in
+            let previousStatus = session.status
             session.status = .completed
             do {
                 try SyncStore.save(modelContext)
                 dismiss()
             } catch {
+                session.status = previousStatus
                 isCompleting = false
                 saveErrorMessage = error.localizedDescription
                 showSaveError = true
@@ -1125,10 +1128,11 @@ private struct CollapsedAthleteRow: View {
                 Image(systemName: "checkmark.circle.fill")
                     .font(.subheadline)
                     .foregroundStyle(.green)
+                // Wraps rather than truncating ("Jorda…") at large text sizes; the name is the row.
                 Text(athlete.fullName)
                     .font(.subheadline).fontWeight(.medium)
                     .foregroundStyle(.primary)
-                    .lineLimit(1)
+                    .multilineTextAlignment(.leading)
                 Spacer()
                 Text(repCount == 1 ? "1 rep ✓" : "\(repCount) reps ✓")
                     .font(.caption)
@@ -1161,6 +1165,8 @@ struct AthleteTimeEntryCard: View {
 
     @Environment(\.modelContext) private var modelContext
     @State private var showingNoteSheet = false
+    @State private var showSaveError = false
+    @State private var saveErrorMessage = ""
 
     /// True when a session-level note already exists for this athlete.
     private var hasNote: Bool {
@@ -1184,6 +1190,9 @@ struct AthleteTimeEntryCard: View {
                     .overlay(
                         Text(athlete.firstName.prefix(1) + athlete.lastName.prefix(1))
                             .font(.caption).fontWeight(.bold).foregroundStyle(Color.accentColor)
+                            // The circle is a fixed 34pt; past xxLarge the initials became "…".
+                            .dynamicTypeSize(...DynamicTypeSize.xxLarge)
+                            .accessibilityHidden(true)
                     )
                 VStack(alignment: .leading, spacing: 2) {
                     Text(athlete.fullName)
@@ -1263,6 +1272,11 @@ struct AthleteTimeEntryCard: View {
         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
         .sheet(isPresented: $showingNoteSheet) {
             AthleteNoteSheet(athlete: athlete, session: session, modelContext: modelContext)
+        }
+        .alert("Save Error", isPresented: $showSaveError) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(saveErrorMessage)
         }
     }
 
@@ -1356,9 +1370,14 @@ struct AthleteTimeEntryCard: View {
     }
 
     private func setStatus(rep: Int, status: RepEntryStatus) {
+        // Undo only this rep's change on a failed save; a context-wide rollback could
+        // discard other unsaved logger edits.
+        let undo: () -> Void
         if let record = (block.performanceRecords ?? []).first(where: {
             $0.athlete?.id == athlete.id && $0.repNumber == rep
         }) {
+            let (oldStatus, oldTimeMs) = (record.status, record.recordedTimeMs)
+            undo = { record.status = oldStatus; record.recordedTimeMs = oldTimeMs }
             record.status = status
             record.recordedTimeMs = nil
         } else {
@@ -1371,8 +1390,15 @@ struct AthleteTimeEntryCard: View {
                 status: status
             )
             modelContext.insert(slot)
+            undo = { modelContext.delete(slot) }
         }
-        try? SyncStore.save(modelContext)
+        do {
+            try SyncStore.save(modelContext)
+        } catch {
+            undo()
+            saveErrorMessage = error.localizedDescription
+            showSaveError = true
+        }
     }
 }
 
@@ -1585,13 +1611,13 @@ struct FocusField: Hashable {
     let rep: Int
 }
 
-/// True when the trimmed text is a loggable rep value: a parseable time or a
-/// DNS/DNF marker. Single rule shared by `TimeTextField` validation and the
+/// True when the trimmed text is a loggable rep value: a parseable time above
+/// zero (matching `saveEntry`) or a DNS/DNF marker. Single rule shared by `TimeTextField` validation and the
 /// logger's fully-logged checks so the two can't drift.
 func isLoggableEntryText(_ text: String) -> Bool {
     let t = text.trimmingCharacters(in: .whitespaces).uppercased()
     guard !t.isEmpty else { return false }
-    return t == "DNS" || t == "DNF" || parseTimeToMs(t) != nil
+    return t == "DNS" || t == "DNF" || (parseTimeToMs(t) ?? 0) > 0
 }
 
 /// Text field for timing input that also supports `DNS` and `DNF`.
@@ -1688,6 +1714,20 @@ struct SessionSummaryPhaseView: View {
             .reduce(0, +)
     }
 
+    /// Headline numbers for the attendance card; Excused and km appear only when non-zero.
+    private var attendanceStats: [StatStripItem] {
+        var items = [StatStripItem(value: "\(totalPresent)", label: "Present", color: .green),
+                     StatStripItem(value: "\(totalAbsent)", label: "Absent", color: .red)]
+        if totalExcused > 0 {
+            items.append(StatStripItem(value: "\(totalExcused)", label: "Excused", color: .orange))
+        }
+        items.append(StatStripItem(value: "\(totalAthletes)", label: "Total", color: .accentColor))
+        if sessionKm > 0 {
+            items.append(StatStripItem(value: String(format: "%.1f", sessionKm), label: "km", color: .orange))
+        }
+        return items
+    }
+
     /// km per zone (excluding recovery), omitting zones with zero km.
     var sessionZoneBreakdown: [(zone: TrainingZone, km: Double)] {
         let nonRecoveryBlocks = sortedBlocks.filter { $0.trainingZone != .recovery }
@@ -1729,34 +1769,9 @@ struct SessionSummaryPhaseView: View {
                     Label("Attendance", systemImage: "person.2.fill")
                         .font(.subheadline).fontWeight(.semibold)
                         .foregroundStyle(.secondary)
-                    HStack(spacing: 32) {
-                        VStack(spacing: 4) {
-                            Text("\(totalPresent)").font(.title2).fontWeight(.bold).foregroundStyle(.green)
-                            Text("Present").font(.caption).foregroundStyle(.secondary)
-                        }
-                        VStack(spacing: 4) {
-                            Text("\(totalAbsent)").font(.title2).fontWeight(.bold).foregroundStyle(.red)
-                            Text("Absent").font(.caption).foregroundStyle(.secondary)
-                        }
-                        if totalExcused > 0 {
-                            VStack(spacing: 4) {
-                                Text("\(totalExcused)").font(.title2).fontWeight(.bold).foregroundStyle(.orange)
-                                Text("Excused").font(.caption).foregroundStyle(.secondary)
-                            }
-                        }
-                        VStack(spacing: 4) {
-                            Text("\(totalAthletes)").font(.title2).fontWeight(.bold).foregroundStyle(Color.accentColor)
-                            Text("Total").font(.caption).foregroundStyle(.secondary)
-                        }
-                        if sessionKm > 0 {
-                            VStack(spacing: 4) {
-                                Text(String(format: "%.1f", sessionKm))
-                                    .font(.title2).fontWeight(.bold).foregroundStyle(.orange)
-                                Text("km").font(.caption).foregroundStyle(.secondary)
-                            }
-                        }
-                    }
+                    StatStrip(items: attendanceStats)
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(16)
                 .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14))
 
@@ -1885,10 +1900,23 @@ struct SessionSummaryPhaseView: View {
 struct BlockSummaryRow: View {
     let block: SessionBlock
     let presentCount: Int
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
-    /// Number of unique athletes with at least one performance record in this block.
+    /// Side by side normally; stacked at accessibility text sizes, where one row
+    /// broke "Paddle Distance" and "recorded" apart mid-word.
+    private var rowLayout: AnyLayout { adaptiveLayout(spacing: 8) }
+    private var detailsLayout: AnyLayout { adaptiveLayout(spacing: 6) }
+
+    private func adaptiveLayout(spacing: CGFloat) -> AnyLayout {
+        dynamicTypeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: spacing))
+            : AnyLayout(HStackLayout(spacing: spacing))
+    }
+
+    /// Number of unique athletes with at least one filled slot (a time, DNS, or DNF) in this block.
+    /// Pending slots are pre-created for every present athlete, so they don't count.
     var recordedCount: Int {
-        Set((block.performanceRecords ?? []).compactMap { $0.athlete?.id }).count
+        Set((block.performanceRecords ?? []).filter(\.holdsRecordedData).compactMap { $0.athlete?.id }).count
     }
 
     /// Distance shown for the block; recovery exclusion is handled by the parent summary.
@@ -1897,10 +1925,10 @@ struct BlockSummaryRow: View {
     }
 
     var body: some View {
-        HStack {
+        rowLayout {
             VStack(alignment: .leading, spacing: 3) {
                 Text(block.blockName).font(.subheadline)
-                HStack(spacing: 6) {
+                detailsLayout {
                     Text(block.blockType.rawValue).font(.caption).foregroundStyle(.secondary)
                     if let zone = block.trainingZone {
                         Text(zone.rawValue)
@@ -1917,7 +1945,7 @@ struct BlockSummaryRow: View {
                     }
                 }
             }
-            Spacer()
+            if !dynamicTypeSize.isAccessibilitySize { Spacer() }
             Text("\(recordedCount)/\(presentCount) recorded")
                 .font(.caption)
                 .foregroundStyle(recordedCount == presentCount ? .green : .orange)

@@ -34,6 +34,17 @@ enum SeasonContext {
         return date >= interval.start && date < interval.end
     }
 
+    /// Starting value for a new athlete's date-of-birth picker: Jan 1, twelve season-years
+    /// back (a U12). Defaulting to today made every new athlete "N/A" until edited, and
+    /// left the coach scrolling back a decade per athlete.
+    static func defaultNewAthleteDateOfBirth(
+        calendar: Calendar = .current,
+        referenceDate: Date = Date()
+    ) -> Date {
+        let year = currentYear(calendar: calendar, referenceDate: referenceDate) - 12
+        return calendar.date(from: DateComponents(year: year, month: 1, day: 1)) ?? referenceDate
+    }
+
     /// Age as (season year − birth year). Uses the calendar year only — not a
     /// configurable cutoff date — per the app's age-category business rule.
     static func athleteAge(

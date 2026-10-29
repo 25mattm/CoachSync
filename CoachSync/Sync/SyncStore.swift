@@ -11,6 +11,7 @@
 /// rows must not be re-stamped or re-queued (they originated on the server).
 
 import Foundation
+import OSLog
 import SwiftData
 
 /// A SwiftData model that participates in backend sync.
@@ -57,6 +58,20 @@ enum SyncStore {
         try context.save()
         if enqueued {
             NotificationCenter.default.post(name: didSaveNotification, object: nil)
+        }
+    }
+
+    private static let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "CoachSync",
+                                       category: "persistence")
+
+    /// `save(_:)` for background housekeeping the coach can't act on (draft sweeps, slot
+    /// backfill): a failure is logged instead of thrown. User-initiated saves must call
+    /// `save(_:)` and surface the error. This is the only sanctioned way to not propagate one.
+    static func saveLoggingFailure(_ context: ModelContext, _ operation: StaticString) {
+        do {
+            try save(context)
+        } catch {
+            logger.error("\(operation, privacy: .public) save failed: \(error.localizedDescription, privacy: .public)")
         }
     }
 

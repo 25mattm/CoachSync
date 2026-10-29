@@ -153,7 +153,8 @@ enum CoachSyncContainer {
             // Deliberately NOT named "Test Athlete" — AthleteCRUDUITests creates
             // and asserts on an athlete with that exact name, and a same-named
             // seed row would make that assertion trivially pass even if broken.
-            let athlete = Athlete(firstName: "Roster", lastName: "Seed", dateOfBirth: Date())
+            let athlete = Athlete(firstName: "Roster", lastName: "Seed",
+                                  dateOfBirth: SeasonContext.defaultNewAthleteDateOfBirth())
             athlete.id = uiTestAthleteID
             container.mainContext.insert(athlete)
             try? container.mainContext.save()
