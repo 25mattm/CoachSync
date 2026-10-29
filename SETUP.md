@@ -47,10 +47,23 @@ where-to-read-first: [`README.md`](README.md).
 
 ### Pointing the app at the backend (optional)
 
-Club-sync features talk to the backend. `BackendConfig` reads the base URL from the Info.plist
-key **`CoachSyncBackendURL`** (dev default `http://localhost:8080`). Run the backend locally
-(below), or set this key to a deployed HTTPS URL. Sign-in additionally requires the coach's
-email to be in the backend allowlist — see [Authentication in backend/README](backend/README.md#authentication).
+Club-sync features talk to the backend. Debug builds always use `http://localhost:8080`, so run
+the backend locally (below). Release builds read the Info.plist key **`CoachSyncBackendURL`**,
+filled from `COACHSYNC_BACKEND_URL` (see the next section). Sign-in additionally requires the
+coach's email to be in the backend allowlist — see [Authentication in backend/README](backend/README.md#authentication).
+
+### Release builds: your bundle ID, team and backend
+
+The repo ships public placeholders in `Config/Shared.xcconfig` (`com.example` bundle IDs, no
+signing team, a localhost backend). They build, run and test as-is, but **archiving refuses
+them**. Put your own values in a gitignored `Config/Local.xcconfig`:
+
+```bash
+cp Config/Local.xcconfig.example Config/Local.xcconfig
+```
+
+Then set `COACHSYNC_BUNDLE_ID_PREFIX`, `COACHSYNC_DEVELOPMENT_TEAM` and an https
+`COACHSYNC_BACKEND_URL` in it. Every target and configuration picks them up.
 
 ## The backend
 

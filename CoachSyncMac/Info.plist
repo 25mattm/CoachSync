@@ -4,9 +4,9 @@
 <dict>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
-	<!-- Point this at your own backend (see backend/README.md). -->
+	<!-- Release builds: set COACHSYNC_BACKEND_URL in Config/Local.xcconfig. Debug builds use localhost. -->
 	<key>CoachSyncBackendURL</key>
-	<string>http://localhost:8080</string>
+	<string>$(COACHSYNC_BACKEND_URL)</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsLocalNetworking</key>

@@ -73,6 +73,7 @@
 		C6C97A233A9DDE6EC90042E2 /* LoadRulesTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LoadRulesTests.swift; sourceTree = "<group>"; };
 		C0DEC0DE00000000000000A0 /* VisualTourUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VisualTourUITests.swift; sourceTree = "<group>"; };
 		C0DEC0DE00000000000000B0 /* StringHelpersTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringHelpersTests.swift; sourceTree = "<group>"; };
+		C0DEC0DE00000000000000C0 /* Shared.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Shared.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -148,6 +149,7 @@
 		18A060042F843F720015A9B5 = {
 			isa = PBXGroup;
 			children = (
+				C0DEC0DE00000000000000C1 /* Config */,
 				18A0600F2F843F720015A9B5 /* CoachSync */,
 				1835A4372F871006003FA90D /* CoachSyncMac */,
 				C0DEC0DE0000000000000004 /* CoachSyncTests */,
@@ -211,6 +213,14 @@
 			path = CoachSyncUITests;
 			sourceTree = "<group>";
 		};
+		C0DEC0DE00000000000000C1 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				C0DEC0DE00000000000000C0 /* Shared.xcconfig */,
+			);
+			path = Config;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -218,6 +228,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 1835A4402F871007003FA90D /* Build configuration list for PBXNativeTarget "CoachSyncMac" */;
 			buildPhases = (
+				C0DEC0DE00000000000000C3 /* Check release config */,
 				1835A4322F871006003FA90D /* Sources */,
 				1835A4332F871006003FA90D /* Frameworks */,
 				1835A4342F871006003FA90D /* Resources */,
@@ -239,6 +250,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 18A0601A2F843F730015A9B5 /* Build configuration list for PBXNativeTarget "CoachSync" */;
 			buildPhases = (
+				C0DEC0DE00000000000000C2 /* Check release config */,
 				18A060092F843F720015A9B5 /* Sources */,
 				18A0600A2F843F720015A9B5 /* Frameworks */,
 				18A0600B2F843F720015A9B5 /* Resources */,
@@ -369,6 +381,49 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		C0DEC0DE00000000000000C3 /* Check release config */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/scripts/check-release-config.sh",
+			);
+			name = "Check release config";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"$SRCROOT/scripts/check-release-config.sh\"\n";
+		};
+		C0DEC0DE00000000000000C2 /* Check release config */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/scripts/check-release-config.sh",
+			);
+			name = "Check release config";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"$SRCROOT/scripts/check-release-config.sh\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		1835A4322F871006003FA90D /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -446,7 +501,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 8;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = "$(COACHSYNC_DEVELOPMENT_TEAM)";
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
@@ -461,7 +516,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 26.4;
 				MARKETING_VERSION = 1.2;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.CoachSyncMac;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(COACHSYNC_BUNDLE_ID_PREFIX).CoachSyncMac";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = macosx;
@@ -487,7 +542,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 8;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = "$(COACHSYNC_DEVELOPMENT_TEAM)";
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
@@ -502,7 +557,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 26.4;
 				MARKETING_VERSION = 1.2;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.CoachSyncMac;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(COACHSYNC_BUNDLE_ID_PREFIX).CoachSyncMac";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = macosx;
@@ -520,6 +575,7 @@
 		};
 		18A060182F843F730015A9B5 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = C0DEC0DE00000000000000C0 /* Shared.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -553,7 +609,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = "$(COACHSYNC_DEVELOPMENT_TEAM)";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -585,6 +641,7 @@
 		};
 		18A060192F843F730015A9B5 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = C0DEC0DE00000000000000C0 /* Shared.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -618,7 +675,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = "$(COACHSYNC_DEVELOPMENT_TEAM)";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -649,7 +706,7 @@
 				CODE_SIGN_ENTITLEMENTS = CoachSync/CoachSync.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 8;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = "$(COACHSYNC_DEVELOPMENT_TEAM)";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = CoachSync/Info.plist;
@@ -664,7 +721,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.2;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.CoachSync;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(COACHSYNC_BUNDLE_ID_PREFIX).CoachSync";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -684,7 +741,7 @@
 				CODE_SIGN_ENTITLEMENTS = CoachSync/CoachSync.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 8;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = "$(COACHSYNC_DEVELOPMENT_TEAM)";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = CoachSync/Info.plist;
@@ -699,7 +756,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.2;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.CoachSync;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(COACHSYNC_BUNDLE_ID_PREFIX).CoachSync";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -716,11 +773,11 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 8;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = "$(COACHSYNC_DEVELOPMENT_TEAM)";
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
 				MARKETING_VERSION = 1.2;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.CoachSyncUITests;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(COACHSYNC_BUNDLE_ID_PREFIX).CoachSyncUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -737,7 +794,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 8;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = "$(COACHSYNC_DEVELOPMENT_TEAM)";
 				ENABLE_TESTABILITY = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
@@ -747,7 +804,7 @@
 					"@loader_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.2;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.CoachSyncTests;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(COACHSYNC_BUNDLE_ID_PREFIX).CoachSyncTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -764,7 +821,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 8;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = "$(COACHSYNC_DEVELOPMENT_TEAM)";
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -773,7 +830,7 @@
 					"@loader_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.2;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.CoachSyncTests;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(COACHSYNC_BUNDLE_ID_PREFIX).CoachSyncTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -789,11 +846,11 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 8;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = "$(COACHSYNC_DEVELOPMENT_TEAM)";
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
 				MARKETING_VERSION = 1.2;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.CoachSyncUITests;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(COACHSYNC_BUNDLE_ID_PREFIX).CoachSyncUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;

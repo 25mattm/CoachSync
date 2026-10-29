@@ -22,3 +22,6 @@ docs/HANDOFF_*.md
 backend/target/
 .env
 .env.*
+
+# Real bundle ID, team and backend URL for release builds (see Config/Local.xcconfig.example)
+Config/Local.xcconfig
