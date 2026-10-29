@@ -276,4 +276,68 @@ final class SlotReconciliationTests: XCTestCase {
         XCTAssertEqual(BlockSummaryRow(block: block, presentCount: 3).recordedCount, 2,
                        "DNS is a deliberate outcome and counts as recorded")
     }
+
+    // MARK: - Shared fixture (also run by the backend's SlotReconciliationFixtureTest)
+
+    func testSharedFixtureCases() throws {
+        let url = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+            .appendingPathComponent("shared/fixtures/slot-reconciliation.json")
+        let fixture = try JSONDecoder().decode(SlotFixture.self, from: Data(contentsOf: url))
+        XCTAssertFalse(fixture.cases.isEmpty)
+
+        for testCase in fixture.cases {
+            let context = try TestSupport.makeInMemoryContext()
+            let blockType = try XCTUnwrap(BlockType(rawValue: testCase.blockType), testCase.name)
+            let session = CoachSession(sessionName: "Practice", scheduledDate: Date())
+            let block = SessionBlock(blockName: "Block", blockType: blockType, sortOrder: 0,
+                                     repetitionCount: testCase.repetitionCount, session: session)
+            context.insert(session)
+            context.insert(block)
+
+            var athletes: [String: Athlete] = [:]
+            func athlete(_ name: String) -> Athlete {
+                if let existing = athletes[name] { return existing }
+                let new = Athlete(firstName: name, lastName: "Fixture", dateOfBirth: Date(timeIntervalSince1970: 0))
+                context.insert(new)
+                athletes[name] = new
+                return new
+            }
+            let present = testCase.present.map(athlete)
+            for slot in testCase.existing {
+                switch slot.state {
+                case "pending": addSlot(context, block: block, athlete: athlete(slot.athlete), rep: slot.rep)
+                case "time": addSlot(context, block: block, athlete: athlete(slot.athlete), rep: slot.rep,
+                                     timeMs: 120_000, status: .complete)
+                case "dns": addSlot(context, block: block, athlete: athlete(slot.athlete), rep: slot.rep, status: .dns)
+                case "dnf": addSlot(context, block: block, athlete: athlete(slot.athlete), rep: slot.rep, status: .dnf)
+                default: XCTFail("Unknown slot state \(slot.state) in \(testCase.name)")
+                }
+            }
+            try context.save()
+
+            let changes = context.reconcileSlots(of: block, presentAthletes: present)
+            try context.save()
+
+            let remaining = Set((block.performanceRecords ?? []).map {
+                "\($0.athlete?.firstName ?? "?")#\($0.repNumber)"
+            })
+            XCTAssertEqual(remaining, Set(testCase.expected.slots), testCase.name)
+            XCTAssertEqual(changes, testCase.expected.changes, testCase.name)
+        }
+    }
+
+    private struct SlotFixture: Decodable {
+        struct Slot: Decodable { let athlete: String; let rep: Int; let state: String }
+        struct Expected: Decodable { let slots: [String]; let changes: Int }
+        struct Case: Decodable {
+            let name: String
+            let blockType: String
+            let repetitionCount: Int
+            let present: [String]
+            let existing: [Slot]
+            let expected: Expected
+        }
+        let cases: [Case]
+    }
 }

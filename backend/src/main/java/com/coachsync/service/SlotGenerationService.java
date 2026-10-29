@@ -93,10 +93,30 @@ public class SlotGenerationService {
     }
 
     private int reconcileBlock(SessionBlock block, List<Athlete> present, Set<UUID> presentIds) {
+        SlotPlan plan = planBlock(block, present, presentIds, performanceRecords.findBySessionBlockId(block.getId()));
+
+        // One batched DELETE and one batched INSERT (hibernate.jdbc.batch_size).
+        if (!plan.toDelete().isEmpty()) {
+            performanceRecords.deleteAllInBatch(plan.toDelete());
+        }
+        if (!plan.toInsert().isEmpty()) {
+            performanceRecords.saveAll(plan.toInsert());
+        }
+        return plan.toDelete().size() + plan.toInsert().size();
+    }
+
+    /** The slots one block's reconcile deletes and inserts. */
+    record SlotPlan(List<PerformanceRecord> toDelete, List<PerformanceRecord> toInsert) {}
+
+    /**
+     * Works out a block's reconcile without touching the database, so
+     * {@code shared/fixtures/slot-reconciliation.json} — also run by the iOS
+     * {@code ModelContext.reconcileSlots} tests — can check it directly.
+     */
+    static SlotPlan planBlock(SessionBlock block, List<Athlete> present, Set<UUID> presentIds,
+                              List<PerformanceRecord> existing) {
         boolean captures = block.getBlockType().capturesPerRepData();
         int totalReps = slotCapacity(block);
-
-        List<PerformanceRecord> existing = performanceRecords.findBySessionBlockId(block.getId());
 
         // Collect prunable slots: UNFILLED ones beyond capacity, or (for capturing
         // blocks) belonging to athletes no longer present. Filled slots are kept.
@@ -138,15 +158,7 @@ public class SlotGenerationService {
                 }
             }
         }
-
-        // One batched DELETE and one batched INSERT (hibernate.jdbc.batch_size).
-        if (!toDelete.isEmpty()) {
-            performanceRecords.deleteAllInBatch(toDelete);
-        }
-        if (!toInsert.isEmpty()) {
-            performanceRecords.saveAll(toInsert);
-        }
-        return toDelete.size() + toInsert.size();
+        return new SlotPlan(toDelete, toInsert);
     }
 
     /**

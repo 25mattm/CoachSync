@@ -136,17 +136,30 @@ final class CSVParserTests: XCTestCase {
 /// Mirrors the backend's `@Email` closely enough that anything accepted here also syncs.
 final class EmailValidationTests: XCTestCase {
 
-    func testAcceptsOrdinaryAddresses() {
-        for email in ["jane@example.com", "o'neil+club@mail.example.ca", "user@gmail", "a.b-c_d@x-y.org"] {
+    func testRejectsAnEmptyValue() {
+        // Empty means "no email" and is handled before validation; the shared fixture omits it.
+        XCTAssertFalse("".isPlausibleEmail)
+    }
+
+    // MARK: - Shared fixture (also run by the backend's GuardianEmailFixtureTest)
+
+    func testSharedFixtureCases() throws {
+        let url = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+            .appendingPathComponent("shared/fixtures/guardian-emails.json")
+        let fixture = try JSONDecoder().decode(EmailFixture.self, from: Data(contentsOf: url))
+        XCTAssertFalse(fixture.valid.isEmpty)
+        XCTAssertFalse(fixture.invalid.isEmpty)
+        for email in fixture.valid {
             XCTAssertTrue(email.isPlausibleEmail, email)
+        }
+        for email in fixture.invalid {
+            XCTAssertFalse(email.isPlausibleEmail, email)
         }
     }
 
-    func testRejectsAddressesTheBackendWouldRefuse() {
-        for email in ["", "jane", "jane@", "@example.com", "a@b@c.com", "jane smith@example.com",
-                      "jane@example..com", ".jane@example.com", "jane.@example.com", "jane@example.com.",
-                      "jane@-example.com", "jane,smith@example.com"] {
-            XCTAssertFalse(email.isPlausibleEmail, email)
-        }
+    private struct EmailFixture: Decodable {
+        let valid: [String]
+        let invalid: [String]
     }
 }
