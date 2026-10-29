@@ -41,7 +41,7 @@ public class AthleteSignalsService {
     private static final double PACING_CV_ALERT = 0.10;
     /** Average a block's CV over at most this many recent sessions. */
     private static final int RECENT_SESSIONS_FOR_CV = 5;
-    /** Minimum timed reps for a block before a regression slope is meaningful. */
+    /** Minimum timed sessions for a block before a regression slope is meaningful. */
     private static final int MIN_POINTS_FOR_REGRESSION = 3;
     /** Minimum sessions for a block before its averaged CV is meaningful. */
     private static final int MIN_SESSIONS_FOR_CV = 2;
@@ -111,25 +111,36 @@ public class AthleteSignalsService {
     }
 
     /**
-     * The most recently trained block (by name) whose COMPLETE rep times, ordered
-     * by session date, regress with a slope matching the predicate. Needs at least
-     * {@link #MIN_POINTS_FOR_REGRESSION} timed reps for that block name.
+     * The most recently trained block (by name) whose per-session mean COMPLETE rep
+     * time, ordered by session date, regresses with a slope matching the predicate.
+     * One point per session-block, so within-session fatigue and arbitrary rep order
+     * can't read as a trend. Needs at least {@link #MIN_POINTS_FOR_REGRESSION} sessions
+     * for that block name. Mirrors the iOS {@code regressedBlockName}; both run
+     * {@code shared/fixtures/athlete-signals.json}.
      */
     private String regressedBlockName(List<PerformanceRecord> complete, DoublePredicate slopeMatches) {
+        Map<String, List<SessionPoint>> byName = new HashMap<>();
+        for (List<PerformanceRecord> group : groupBy(complete, r -> r.getSessionBlock().getId()).values()) {
+            double mean = group.stream().mapToDouble(r -> (double) r.getRecordedTimeMs()).average().orElse(0.0);
+            PerformanceRecord any = group.get(0);
+            byName.computeIfAbsent(blockName(any), k -> new ArrayList<>())
+                    .add(new SessionPoint(sessionDate(any), mean));
+        }
+
         String best = null;
         LocalDate bestDate = null;
-        for (Map.Entry<String, List<PerformanceRecord>> entry : groupBy(complete, this::blockName).entrySet()) {
-            List<PerformanceRecord> records = entry.getValue();
-            if (records.size() < MIN_POINTS_FOR_REGRESSION) {
+        for (Map.Entry<String, List<SessionPoint>> entry : byName.entrySet()) {
+            List<SessionPoint> sessions = new ArrayList<>(entry.getValue());
+            if (sessions.size() < MIN_POINTS_FOR_REGRESSION) {
                 continue;
             }
-            records.sort(Comparator.comparing(this::sessionDate));
-            List<Double> times = records.stream().map(r -> (double) r.getRecordedTimeMs()).toList();
-            OptionalDouble slope = InsightMath.leastSquaresSlope(times);
+            sessions.sort(Comparator.comparing(SessionPoint::date));
+            List<Double> means = sessions.stream().map(SessionPoint::meanMs).toList();
+            OptionalDouble slope = InsightMath.leastSquaresSlope(means);
             if (slope.isEmpty() || !slopeMatches.test(slope.getAsDouble())) {
                 continue;
             }
-            LocalDate mostRecent = sessionDate(records.get(records.size() - 1));
+            LocalDate mostRecent = sessions.get(sessions.size() - 1).date();
             if (bestDate == null || mostRecent.isAfter(bestDate)) {
                 bestDate = mostRecent;
                 best = entry.getKey();
@@ -197,5 +208,9 @@ public class AthleteSignalsService {
 
     /** One per-session CV sample for a block. */
     private record BlockCv(LocalDate date, double cv) {
+    }
+
+    /** One per-session mean rep time for a block (a regression point). */
+    private record SessionPoint(LocalDate date, double meanMs) {
     }
 }

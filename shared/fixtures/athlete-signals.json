@@ -1,0 +1,80 @@
+{
+  "description": "Shared cases for the block-based athlete signals. Run by both the iOS InsightSignalsTests.testSharedFixtureCases and the backend AthleteSignalsFixtureTest, so the two implementations can't drift. Each session holds one block; reps are COMPLETE times in ms; day is an offset from a fixed base date. Expected values are null when the signal must not fire.",
+  "cases": [
+    {
+      "name": "single session rep fade is not a trend",
+      "sessions": [
+        { "day": 0, "block": "3 x 500m", "reps": [120000, 124000, 128000] }
+      ],
+      "expected": { "decliningBlock": null, "mostImprovedBlock": null, "inconsistentPacing": null }
+    },
+    {
+      "name": "slower across three sessions is declining",
+      "sessions": [
+        { "day": 0, "block": "500m TT", "reps": [120000] },
+        { "day": 1, "block": "500m TT", "reps": [124000] },
+        { "day": 2, "block": "500m TT", "reps": [128000] }
+      ],
+      "expected": { "decliningBlock": "500m TT", "mostImprovedBlock": null, "inconsistentPacing": null }
+    },
+    {
+      "name": "faster across three sessions is most improved",
+      "sessions": [
+        { "day": 0, "block": "500m TT", "reps": [128000] },
+        { "day": 1, "block": "500m TT", "reps": [124000] },
+        { "day": 2, "block": "500m TT", "reps": [120000] }
+      ],
+      "expected": { "decliningBlock": null, "mostImprovedBlock": "500m TT", "inconsistentPacing": null }
+    },
+    {
+      "name": "two sessions are too few even with many reps",
+      "sessions": [
+        { "day": 0, "block": "4 x 250m", "reps": [60000, 61000, 62000, 63000] },
+        { "day": 1, "block": "4 x 250m", "reps": [66000, 67000, 68000, 69000] }
+      ],
+      "expected": { "decliningBlock": null, "mostImprovedBlock": null, "inconsistentPacing": null }
+    },
+    {
+      "name": "within-session fade with flat session means is silent",
+      "sessions": [
+        { "day": 0, "block": "2 x 500m", "reps": [120000, 130000] },
+        { "day": 1, "block": "2 x 500m", "reps": [130000, 120000] },
+        { "day": 2, "block": "2 x 500m", "reps": [125000, 125000] }
+      ],
+      "expected": { "decliningBlock": null, "mostImprovedBlock": null, "inconsistentPacing": null }
+    },
+    {
+      "name": "drift inside the 50 ms dead band is silent",
+      "sessions": [
+        { "day": 0, "block": "500m TT", "reps": [120000] },
+        { "day": 1, "block": "500m TT", "reps": [120020] },
+        { "day": 2, "block": "500m TT", "reps": [120040] }
+      ],
+      "expected": { "decliningBlock": null, "mostImprovedBlock": null, "inconsistentPacing": null }
+    },
+    {
+      "name": "most recently trained declining block wins",
+      "sessions": [
+        { "day": 0, "block": "500m TT", "reps": [120000] },
+        { "day": 1, "block": "500m TT", "reps": [124000] },
+        { "day": 2, "block": "500m TT", "reps": [128000] },
+        { "day": 5, "block": "200m TT", "reps": [40000] },
+        { "day": 6, "block": "200m TT", "reps": [41333] },
+        { "day": 7, "block": "200m TT", "reps": [42666] }
+      ],
+      "expected": { "decliningBlock": "200m TT", "mostImprovedBlock": null, "inconsistentPacing": null }
+    },
+    {
+      "name": "erratic pacing over two sessions reports rounded CV percent",
+      "sessions": [
+        { "day": 0, "block": "Pyramid", "reps": [100000, 140000, 100000, 140000] },
+        { "day": 1, "block": "Pyramid", "reps": [100000, 140000, 100000, 140000] }
+      ],
+      "expected": {
+        "decliningBlock": null,
+        "mostImprovedBlock": null,
+        "inconsistentPacing": { "blockName": "Pyramid", "cvPercent": 17 }
+      }
+    }
+  ]
+}
