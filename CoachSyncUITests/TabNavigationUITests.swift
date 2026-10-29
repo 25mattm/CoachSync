@@ -4,20 +4,20 @@ import XCTest
 final class TabNavigationUITests: CoachSyncUITestCase {
 
     func testTabBarNavigatesAllFiveSections() throws {
-        app.tabBars.buttons["tab.athletes"].tap()
+        app.tab(.athletes).tap()
         XCTAssertTrue(app.navigationBars["Athletes"].waitForExistence(timeout: 2))
 
-        app.tabBars.buttons["tab.teams"].tap()
+        app.tab(.teams).tap()
         XCTAssertTrue(app.navigationBars["Teams"].waitForExistence(timeout: 2))
 
-        app.tabBars.buttons["tab.schedule"].tap()
+        app.tab(.schedule).tap()
         XCTAssertTrue(app.navigationBars["Schedule"].waitForExistence(timeout: 2))
 
-        app.tabBars.buttons["tab.settings"].tap()
+        app.tab(.settings).tap()
         XCTAssertTrue(app.navigationBars["Settings"].waitForExistence(timeout: 2))
 
-        app.tabBars.buttons["tab.home"].tap()
-        XCTAssertTrue(app.tabBars.buttons["tab.home"].waitForExistence(timeout: 2))
-        XCTAssertTrue(app.tabBars.buttons["tab.home"].isSelected)
+        app.tab(.home).tap()
+        XCTAssertTrue(app.tab(.home).waitForExistence(timeout: 2))
+        XCTAssertTrue(app.tab(.home).isSelected)
     }
 }
