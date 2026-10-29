@@ -47,7 +47,7 @@ public abstract class BaseEntity {
             id = UUID.randomUUID();
         }
         if (updatedAt == null) {
-            updatedAt = Instant.now();
+            updatedAt = Timestamps.now();
         }
     }
 

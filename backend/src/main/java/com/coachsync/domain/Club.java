@@ -35,7 +35,7 @@ public class Club extends BaseEntity {
     private String joinCode = UUID.randomUUID().toString().substring(0, 8).toUpperCase(Locale.ROOT);
 
     @Column(name = "created_at", nullable = false)
-    private Instant createdAt = Instant.now();
+    private Instant createdAt = Timestamps.now();
 
     public String getName() {
         return name;

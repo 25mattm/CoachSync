@@ -2,6 +2,7 @@ package com.coachsync.service;
 
 import com.coachsync.domain.Coach;
 import com.coachsync.domain.CoachSession;
+import com.coachsync.domain.Timestamps;
 import com.coachsync.domain.enums.SessionStatus;
 import com.coachsync.repository.CoachRepository;
 import com.coachsync.repository.CoachSessionRepository;
@@ -12,7 +13,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -86,7 +86,7 @@ public class SessionService {
                     "Session " + id + " is completed and cannot be reopened; archive it instead.");
         }
         session.setStatus(status);
-        session.setUpdatedAt(Instant.now());
+        session.setUpdatedAt(Timestamps.now());
         return sessions.save(session);
     }
 
@@ -94,7 +94,7 @@ public class SessionService {
     public CoachSession setArchived(UUID id, boolean archived) {
         CoachSession session = get(id);
         session.setArchived(archived);
-        session.setUpdatedAt(Instant.now());
+        session.setUpdatedAt(Timestamps.now());
         return sessions.save(session);
     }
 

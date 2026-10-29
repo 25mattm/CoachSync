@@ -39,7 +39,7 @@ public class RegattaResult extends TenantScoped {
     @Lob
     private String notes;
 
-    private Instant createdAt = Instant.now();
+    private Instant createdAt = Timestamps.now();
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "athlete_id", nullable = false)
