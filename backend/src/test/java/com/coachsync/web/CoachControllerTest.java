@@ -14,13 +14,14 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
+import java.time.Duration;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -147,11 +148,12 @@ class CoachControllerTest {
         Coach reloaded = coaches.findById(id).orElseThrow();
         assertEquals("apple-sub-xyz", reloaded.getAppleUserId(), "Apple link must survive a re-POST");
         assertEquals("coach@example.com", reloaded.getEmail(), "email must survive a re-POST");
-        // Compared at the column's microsecond precision: on Linux, Instant.now() carries
-        // nanoseconds that the stored value has already dropped, which isn't a reset.
-        assertEquals(originalCreatedAt.truncatedTo(ChronoUnit.MICROS),
-                reloaded.getCreatedAt().truncatedTo(ChronoUnit.MICROS),
-                "createdAt must not be reset by a re-POST");
+        // Within the column's microsecond precision: on Linux, Instant.now() carries nanoseconds
+        // that the database rounds away on store, which isn't a reset (a reset differs by far more).
+        Duration drift = Duration.between(originalCreatedAt, reloaded.getCreatedAt()).abs();
+        assertTrue(drift.compareTo(Duration.ofNanos(1_000)) < 0,
+                "createdAt must not be reset by a re-POST (was " + originalCreatedAt
+                        + ", now " + reloaded.getCreatedAt() + ")");
     }
 
     @Test
