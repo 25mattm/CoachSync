@@ -1,0 +1,47 @@
+# Nightly (and on demand): the full UI suite, then the visual tour in light, dark and
+# Accessibility XL. Screenshots are kept as artifacts so layout regressions can be compared
+# against earlier runs — export them with:
+#   xcrun xcresulttool export attachments --path <result>.xcresult --output-path <dir>
+name: Nightly UI
+
+on:
+  schedule:
+    - cron: "0 7 * * *"   # 07:00 UTC
+  workflow_dispatch:
+
+jobs:
+  ui:
+    name: UI tests + visual tour
+    runs-on: macos-26
+    timeout-minutes: 60
+    env:
+      DESTINATION: platform=iOS Simulator,name=iPhone 17
+    steps:
+      - uses: actions/checkout@v4
+      - name: Boot simulator
+        run: xcrun simctl boot "iPhone 17" || true
+      # Light appearance; includes VisualTourUITests (default and Accessibility XL text).
+      - name: UI tests (light)
+        run: |
+          xcrun simctl ui booted appearance light
+          xcodebuild test \
+            -project CoachSync.xcodeproj -scheme CoachSync \
+            -destination "$DESTINATION" \
+            -only-testing:CoachSyncUITests \
+            -resultBundlePath build/ui-light.xcresult
+      - name: Visual tour (dark)
+        if: always()
+        run: |
+          xcrun simctl ui booted appearance dark
+          xcodebuild test \
+            -project CoachSync.xcodeproj -scheme CoachSync \
+            -destination "$DESTINATION" \
+            -only-testing:CoachSyncUITests/VisualTourUITests/testVisualTour \
+            -resultBundlePath build/ui-dark.xcresult
+      - name: Upload results and screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-xcresults
+          path: build/*.xcresult
+          retention-days: 14

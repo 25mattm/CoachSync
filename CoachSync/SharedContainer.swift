@@ -157,7 +157,7 @@ enum CoachSyncContainer {
                                   dateOfBirth: SeasonContext.defaultNewAthleteDateOfBirth())
             athlete.id = uiTestAthleteID
             container.mainContext.insert(athlete)
-            try? container.mainContext.save()
+            try container.mainContext.save()
             return LaunchState(container: container, launchErrorMessage: nil)
         } catch {
             fatalError("CoachSync: failed to create UI testing ModelContainer — \(error)")

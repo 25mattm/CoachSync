@@ -95,7 +95,7 @@ struct SyncPusher {
         // entity the backend already has — a 409, which `execute` clears, silently dropping the
         // coach's coalesced edits. Saving on every exit keeps the cleared rows cleared.
         var stuckCount = notReadyCount
-        defer { try? context.save() }
+        defer { try? context.save() }   // swallowed-save-ok: `defer` can't throw; see above
         for op in upserts + deletes {
             if try await execute(op) {
                 stuckCount += 1
