@@ -168,6 +168,25 @@ public class CoachService {
         return coaches.save(coach);
     }
 
+    /**
+     * Operator-only: removes a coach from their club, for when a coach leaves or is dismissed.
+     * {@code ActiveCoachFilter} rejects the coach's outstanding tokens on their next request, and any
+     * later sign-in issues a token with no {@code club} claim, so getting back in means a new join
+     * request and a new approval. Only membership changes: the row stays so that sessions, notes and
+     * journal entries keep their attribution. Un-tenanted lookup, same reasoning as {@link #approve}.
+     */
+    @Transactional
+    public Coach removeFromClub(UUID id) {
+        operatorGuard.requireOperator();
+        Coach coach = coaches.findById(id)
+                .orElseThrow(() -> new NotFoundException("No coach with id " + id));
+        if (coach.getClub() == null) {
+            throw new ConflictException("Coach " + id + " does not belong to a club.");
+        }
+        coach.setClub(null);
+        return coaches.save(coach);
+    }
+
     /** True only when the coach is in the caller's club. A club-less coach belongs to no caller. */
     private boolean inCurrentClub(Coach coach) {
         UUID current = tenant.currentClubId().orElse(null);

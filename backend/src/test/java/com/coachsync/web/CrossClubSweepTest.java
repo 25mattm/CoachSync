@@ -247,6 +247,7 @@ class CrossClubSweepTest {
             "POST /api/auth/apple", "pre-auth sign-in; no tenant exists yet",
             "POST /api/clubs", "operator-only (OperatorGuard); creates a new club",
             "POST /api/coaches/{id}/approve", "operator-only (OperatorGuard); cross-club by design",
+            "POST /api/coaches/{id}/remove", "operator-only (OperatorGuard); cross-club by design; CoachRemovalTest",
             "POST /api/clubs/join", "JoinFlowTest",
             "POST /api/athletes", "CreateByIdCollisionTest (body-supplied id collision)",
             "POST /api/sessions", "CreateByIdCollisionTest, RelationshipIsolationTest (foreign teamId)",
