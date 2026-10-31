@@ -13,6 +13,17 @@
 	<dict>
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
+		<key>NSExceptionDomains</key>
+		<dict>
+			<!-- Filled in by the Info.plist preprocessor; see Config/Shared.xcconfig. -->
+			<key>COACHSYNC_PRIVATE_NETWORK_DOMAIN</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+			</dict>
+		</dict>
 	</dict>
 </dict>
 </plist>

@@ -62,8 +62,9 @@ them**. Put your own values in a gitignored `Config/Local.xcconfig`:
 cp Config/Local.xcconfig.example Config/Local.xcconfig
 ```
 
-Then set `COACHSYNC_BUNDLE_ID_PREFIX`, `COACHSYNC_DEVELOPMENT_TEAM` and an https
-`COACHSYNC_BACKEND_URL` and `COACHSYNC_PRIVACY_POLICY_URL` in it. Every target and configuration picks them up.
+Then set `COACHSYNC_BUNDLE_ID_PREFIX`, `COACHSYNC_DEVELOPMENT_TEAM`, an https
+`COACHSYNC_BACKEND_URL` and `COACHSYNC_PRIVACY_POLICY_URL` in it. A backend on a private network that
+encrypts its own traffic can use http instead, once `COACHSYNC_PRIVATE_NETWORK_DOMAIN` names that domain. Every target and configuration picks them up.
 
 ## The backend
 

@@ -75,6 +75,14 @@ jobs:
              scripts/check-release-config.sh; then
             echo "check-release-config.sh accepted the placeholders"; exit 1
           fi
+          if ACTION=install PRODUCT_BUNDLE_IDENTIFIER=com.yourname.CoachSync DEVELOPMENT_TEAM=ABCDE12345 \
+             COACHSYNC_BACKEND_URL=http://coachsync.example.com COACHSYNC_PRIVATE_NETWORK_DOMAIN=localhost \
+             COACHSYNC_PRIVACY_POLICY_URL=https://coachsync.example.com/privacy scripts/check-release-config.sh; then
+            echo "check-release-config.sh accepted http off the private network"; exit 1
+          fi
+          ACTION=install PRODUCT_BUNDLE_IDENTIFIER=com.yourname.CoachSync DEVELOPMENT_TEAM=ABCDE12345 \
+            COACHSYNC_BACKEND_URL=http://host.private.example:8081 COACHSYNC_PRIVATE_NETWORK_DOMAIN=private.example \
+            COACHSYNC_PRIVACY_POLICY_URL=https://coachsync.example.com/privacy scripts/check-release-config.sh
           ACTION=install PRODUCT_BUNDLE_IDENTIFIER=com.yourname.CoachSync DEVELOPMENT_TEAM=ABCDE12345 \
             COACHSYNC_BACKEND_URL=https://coachsync.example.com \
             COACHSYNC_PRIVACY_POLICY_URL=https://coachsync.example.com/privacy scripts/check-release-config.sh
