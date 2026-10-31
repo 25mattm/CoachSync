@@ -106,6 +106,15 @@ enum SyncMapping {
         return false
     }
 
+    /// Updates a record's "logged by" name snapshot from its coach. Leaves it alone when the coach
+    /// doesn't resolve: a coach pending local deletion resolves to nil, and clearing the name would
+    /// lose attribution. It self-heals on a later pull once the coach exists.
+    private static func refreshAttribution(of record: some CoachAttributed, coachId: UUID?, in ctx: ModelContext) {
+        if let name = coachId.flatMap({ existingCoach($0, in: ctx)?.name }), record.createdByCoachName != name {
+            record.createdByCoachName = name
+        }
+    }
+
     // MARK: - Top-level resources (id-matched)
 
     static func upsertCoach(_ dto: CoachDTO, in ctx: ModelContext, pending: Set<UUID> = []) {
@@ -166,6 +175,9 @@ enum SyncMapping {
 
     static func upsertSession(_ dto: SessionDTO, in ctx: ModelContext, pending: Set<UUID> = []) {
         let existing = existingSession(dto.id, in: ctx)
+        // Before the merge check: a coach's rename or deleted account doesn't change this record's
+        // own timestamp, so the merge below would never pick it up.
+        if let existing { refreshAttribution(of: existing, coachId: dto.coachId, in: ctx) }
         if skipMerge(id: dto.id, server: dto.updatedAt, local: existing?.updatedAt, pending: pending) { return }
         let session = existing ?? insert(
             CoachSession(sessionName: dto.sessionName,
@@ -181,12 +193,7 @@ enum SyncMapping {
         session.mfCue = dto.mfCue
         session.isArchived = dto.archived
         session.team = dto.teamId.flatMap { existingTeam($0, in: ctx) }
-        // Only overwrite the attribution snapshot when the coach resolves — a coach pending local
-        // deletion resolves to nil, and nil-ing the stored name would lose attribution; it self-heals
-        // on a later pull once the coach exists.
-        if let name = dto.coachId.flatMap({ existingCoach($0, in: ctx)?.name }) {
-            session.createdByCoachName = name
-        }
+        refreshAttribution(of: session, coachId: dto.coachId, in: ctx)
         session.createdAt = dto.createdAt
         session.updatedAt = dto.updatedAt
     }
@@ -219,6 +226,9 @@ enum SyncMapping {
 
     static func upsertNote(_ dto: NoteDTO, in ctx: ModelContext, pending: Set<UUID> = []) {
         let existing = existingNote(dto.id, in: ctx)
+        // Before the merge check: a coach's rename or deleted account doesn't change this record's
+        // own timestamp, so the merge below would never pick it up.
+        if let existing { refreshAttribution(of: existing, coachId: dto.coachId, in: ctx) }
         if skipMerge(id: dto.id, server: dto.updatedAt, local: existing?.updatedAt, pending: pending) { return }
         guard let athlete = existingAthlete(dto.athleteId, in: ctx),
               let session = existingSession(dto.sessionId, in: ctx) else { return }
@@ -228,11 +238,7 @@ enum SyncMapping {
         note.athlete = athlete
         note.session = session
         note.sessionBlock = dto.sessionBlockId.flatMap { existingBlock($0, in: ctx) }
-        // Preserve the attribution snapshot when the coach can't be resolved (e.g. pending local
-        // delete) rather than nil-ing it; self-heals on a later pull.
-        if let name = dto.coachId.flatMap({ existingCoach($0, in: ctx)?.name }) {
-            note.createdByCoachName = name
-        }
+        refreshAttribution(of: note, coachId: dto.coachId, in: ctx)
         note.createdAt = dto.createdAt
         note.updatedAt = dto.updatedAt
     }
@@ -335,6 +341,9 @@ enum SyncMapping {
 
     static func upsertJournal(_ dto: JournalDTO, in ctx: ModelContext, pending: Set<UUID> = []) {
         let existing = existingJournal(dto.id, in: ctx)
+        // Before the merge check: a coach's rename or deleted account doesn't change this record's
+        // own timestamp, so the merge below would never pick it up.
+        if let existing { refreshAttribution(of: existing, coachId: dto.coachId, in: ctx) }
         if skipMerge(id: dto.id, server: dto.updatedAt, local: existing?.updatedAt, pending: pending) { return }
         guard let athlete = existingAthlete(dto.athleteId, in: ctx) else { return }
         let note = existing ?? insert(
@@ -344,11 +353,7 @@ enum SyncMapping {
         note.date = SyncDate.localDate(dto.date)
         note.text = dto.text
         note.tags = dto.tags
-        // Preserve the attribution snapshot when the coach can't be resolved (e.g. pending local
-        // delete) rather than nil-ing it; self-heals on a later pull.
-        if let name = dto.coachId.flatMap({ existingCoach($0, in: ctx)?.name }) {
-            note.createdByCoachName = name
-        }
+        refreshAttribution(of: note, coachId: dto.coachId, in: ctx)
         note.createdAt = dto.createdAt
         note.updatedAt = dto.updatedAt
     }
@@ -523,3 +528,12 @@ extension SyncDate {
         return f
     }()
 }
+
+/// Records carrying a "logged by" name snapshot.
+protocol CoachAttributed: AnyObject {
+    var createdByCoachName: String? { get set }
+}
+
+extension CoachSession: CoachAttributed {}
+extension AthleteNote: CoachAttributed {}
+extension DevelopmentNote: CoachAttributed {}

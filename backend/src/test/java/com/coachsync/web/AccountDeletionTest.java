@@ -1,9 +1,12 @@
 package com.coachsync.web;
 
-import com.coachsync.auth.AppleTokenRevoker;
+import com.coachsync.auth.AppleGrantClient;
+import com.coachsync.auth.AppleGrantClient.Exchange;
 import com.coachsync.domain.Coach;
 import com.coachsync.repository.CoachRepository;
+import com.coachsync.repository.PendingAppleRevocationRepository;
 import com.coachsync.web.ClubFixtures.ClubFixture;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,15 +18,18 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
+import java.time.Instant;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
@@ -40,7 +46,20 @@ class AccountDeletionTest {
     @Autowired private MockMvc mvc;
     @Autowired private ClubFixtures fixtures;
     @Autowired private CoachRepository coaches;
-    @MockitoBean private AppleTokenRevoker revoker;
+    @Autowired private PendingAppleRevocationRepository pendingRevocations;
+    @MockitoBean private AppleGrantClient apple;
+
+    @BeforeEach
+    void appleRevokesSuccessfully() {
+        pendingRevocations.deleteAll();
+        when(apple.revoke(any(), any(), any())).thenReturn(true);
+    }
+
+    private void appleConfirms(UUID coachId) {
+        String appleUserId = coaches.findById(coachId).orElseThrow().getAppleUserId();
+        when(apple.exchange("code", CLIENT_ID))
+                .thenReturn(new Exchange.Confirmed(appleUserId, "refresh-1", "refresh_token"));
+    }
 
     private ResultActions deleteAccount(RequestPostProcessor token, String clientId) throws Exception {
         return mvc.perform(post("/api/account/delete").with(token).contentType(MediaType.APPLICATION_JSON)
@@ -56,11 +75,13 @@ class AccountDeletionTest {
     @Test
     void aCoachWithNoHistoryIsRemovedAndTheirAppleGrantRevoked() throws Exception {
         ClubFixture f = fixtures.club();
+        appleConfirms(f.coachId());
 
         deleteAccount(fixtures.token(f), CLIENT_ID).andExpect(status().isNoContent());
 
         assertThat(coaches.findById(f.coachId())).isEmpty();
-        verify(revoker).revoke("code", CLIENT_ID);
+        verify(apple).revoke("refresh-1", "refresh_token", CLIENT_ID);
+        assertThat(pendingRevocations.count()).isZero();
     }
 
     @Test
@@ -68,6 +89,7 @@ class AccountDeletionTest {
         ClubFixture f = fixtures.club("Alice");
         RequestPostProcessor token = fixtures.token(f);
         authorASession(token);
+        appleConfirms(f.coachId());
 
         deleteAccount(token, CLIENT_ID).andExpect(status().isNoContent());
 
@@ -82,10 +104,57 @@ class AccountDeletionTest {
         mvc.perform(get("/api/sessions").with(token)).andExpect(status().isUnauthorized());
     }
 
+    /** Devices only take a coach whose stamp is newer, so without this their name stays forever. */
     @Test
-    void aClubmatesHistoryAndAccountAreUntouched() throws Exception {
+    void anonymizingStampsTheRowSoClubmatesDevicesPickItUp() throws Exception {
+        ClubFixture f = fixtures.club("Alice");
+        authorASession(fixtures.token(f));
+        Instant before = coaches.findById(f.coachId()).orElseThrow().getUpdatedAt();
+        Thread.sleep(2);
+        appleConfirms(f.coachId());
+
+        deleteAccount(fixtures.token(f), CLIENT_ID).andExpect(status().isNoContent());
+
+        assertThat(coaches.findById(f.coachId()).orElseThrow().getUpdatedAt()).isAfter(before);
+    }
+
+    /** A clubmate's device still holds the old details and can push them with a later stamp. */
+    @Test
+    void aClubmatesDeviceCannotWriteADeletedCoachBack() throws Exception {
+        ClubFixture f = fixtures.club("Alice");
+        RequestPostProcessor alice = fixtures.token(f);
+        authorASession(alice);
+        UUID bobId = saveClubmate(f);
+        RequestPostProcessor bob = fixtures.token(new ClubFixture(f.clubId(), bobId));
+        appleConfirms(f.coachId());
+        deleteAccount(alice, CLIENT_ID).andExpect(status().isNoContent());
+
+        String resurrect = "{\"id\":\"" + f.coachId() + "\",\"name\":\"Alice\",\"role\":\"Head\","
+                + "\"updatedAt\":\"2099-01-01T00:00:00Z\"}";
+        mvc.perform(post("/api/coaches").with(bob).contentType(MediaType.APPLICATION_JSON).content(resurrect))
+                .andExpect(status().isConflict());
+        mvc.perform(put("/api/coaches/{id}", f.coachId()).with(bob).contentType(MediaType.APPLICATION_JSON)
+                        .content(resurrect))
+                .andExpect(status().isConflict());
+
+        mvc.perform(get("/api/coaches/{id}", f.coachId()).with(bob))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Former coach"));
+    }
+
+    private UUID saveClubmate(ClubFixture f) {
+        Coach bob = new Coach();
+        bob.setName("Bob");
+        bob.setAppleUserId("apple-" + UUID.randomUUID());
+        bob.setClub(coaches.findById(f.coachId()).orElseThrow().getClub());
+        return coaches.save(bob).getId();
+    }
+
+    @Test
+    void aClubmatesAccountIsUntouched() throws Exception {
         ClubFixture f = fixtures.club("Alice");
         ClubFixture other = fixtures.club("Bob");
+        appleConfirms(f.coachId());
 
         deleteAccount(fixtures.token(f), CLIENT_ID).andExpect(status().isNoContent());
 
@@ -96,6 +165,7 @@ class AccountDeletionTest {
     @Test
     void aCoachStillAwaitingApprovalCanDeleteTheirAccount() throws Exception {
         UUID pending = fixtures.pendingCoach();
+        appleConfirms(pending);
 
         deleteAccount(fixtures.pendingToken(pending), CLIENT_ID).andExpect(status().isNoContent());
 
@@ -103,28 +173,70 @@ class AccountDeletionTest {
     }
 
     @Test
-    void aFailureAtAppleNeverBlocksDeletionOfTheAccount() throws Exception {
+    void aCodeAppleRefusesDeletesNothing() throws Exception {
         ClubFixture f = fixtures.club();
-        doThrow(new IllegalStateException("apple is down")).when(revoker).revoke(any(), any());
+        when(apple.exchange("code", CLIENT_ID)).thenReturn(new Exchange.Rejected());
 
-        // The real revoker swallows its own failures; this proves the data is gone before it runs.
-        try {
-            deleteAccount(fixtures.token(f), CLIENT_ID);
-        } catch (Exception ignored) {
-            // MockMvc rethrows the stubbed failure, which the real revoker would have logged.
-        }
+        deleteAccount(fixtures.token(f), CLIENT_ID).andExpect(status().isForbidden());
+
+        assertThat(coaches.findById(f.coachId())).isPresent();
+        verify(apple, never()).revoke(any(), any(), any());
+    }
+
+    @Test
+    void aCodeForADifferentAppleIdDeletesNothingAndRevokesNothing() throws Exception {
+        ClubFixture f = fixtures.club();
+        when(apple.exchange("code", CLIENT_ID))
+                .thenReturn(new Exchange.Confirmed("someone-else", "refresh-1", "refresh_token"));
+
+        deleteAccount(fixtures.token(f), CLIENT_ID).andExpect(status().isForbidden());
+
+        assertThat(coaches.findById(f.coachId())).isPresent();
+        verify(apple, never()).revoke(any(), any(), any());
+    }
+
+    @Test
+    void anAppleOutageNeverBlocksDeletion() throws Exception {
+        ClubFixture f = fixtures.club();
+        when(apple.exchange("code", CLIENT_ID)).thenReturn(new Exchange.Unavailable());
+
+        deleteAccount(fixtures.token(f), CLIENT_ID).andExpect(status().isNoContent());
 
         assertThat(coaches.findById(f.coachId())).isEmpty();
     }
 
     @Test
-    void anUnknownClientIdIsRefusedBeforeAnythingIsDeleted() throws Exception {
+    void aFailedRevokeIsQueuedAndTheCoachStillToldItWorked() throws Exception {
+        ClubFixture f = fixtures.club();
+        appleConfirms(f.coachId());
+        when(apple.revoke(any(), any(), any())).thenReturn(false);
+
+        deleteAccount(fixtures.token(f), CLIENT_ID).andExpect(status().isNoContent());
+
+        assertThat(coaches.findById(f.coachId())).isEmpty();
+        assertThat(pendingRevocations.findAll()).singleElement()
+                .satisfies(queued -> assertThat(queued.getToken()).isEqualTo("refresh-1"));
+    }
+
+    @Test
+    void anUnexpectedErrorRevokingCannotTurnACommittedDeletionIntoAFailure() throws Exception {
+        ClubFixture f = fixtures.club();
+        appleConfirms(f.coachId());
+        when(apple.revoke(any(), any(), any())).thenThrow(new IllegalStateException("surprise"));
+
+        deleteAccount(fixtures.token(f), CLIENT_ID).andExpect(status().isNoContent());
+
+        assertThat(pendingRevocations.count()).isEqualTo(1);
+    }
+
+    @Test
+    void anUnknownClientIdIsRefusedBeforeAppleIsAsked() throws Exception {
         ClubFixture f = fixtures.club();
 
         deleteAccount(fixtures.token(f), "com.attacker.App").andExpect(status().isBadRequest());
 
         assertThat(coaches.findById(f.coachId())).isPresent();
-        verify(revoker, never()).revoke(any(), any());
+        verify(apple, never()).exchange(any(), any());
     }
 
     @Test

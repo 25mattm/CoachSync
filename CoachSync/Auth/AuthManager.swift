@@ -74,7 +74,17 @@ final class AuthManager {
             let request = try client.jsonRequest(
                 path: "/api/account/delete", method: "POST", token: token,
                 body: DeleteAccountRequestDTO(authorizationCode: authorizationCode, clientId: clientId))
-            guard (200...299).contains(try await client.sendForStatus(request)) else {
+            switch try await client.sendForStatus(request) {
+            case 200...299:
+                break
+            case 401:
+                // The session is dead, which is also what an earlier delete whose reply never
+                // arrived looks like. This device can't tell which, so it's honest about both.
+                signOut()
+                return "You've been signed out, so this device can't confirm your account was deleted. If it wasn't, sign in and try again."
+            case 403:
+                return "Apple couldn't confirm it's you, so your account wasn't deleted. Make sure you're using the Apple ID you signed in with."
+            default:
                 return "Your account wasn't deleted. Please try again."
             }
         } catch BackendError.transport {

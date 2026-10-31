@@ -65,6 +65,20 @@ public class Coach extends BaseEntity {
 
     private Instant createdAt = Timestamps.now();
 
+    /**
+     * When this coach deleted their account, or {@code null}. Marks an anonymized row kept for club
+     * history. {@code appleUserId} can't serve as the marker: roster-only coaches never have one.
+     */
+    private Instant deletedAt;
+
+    public Instant getDeletedAt() {
+        return deletedAt;
+    }
+
+    public void setDeletedAt(Instant deletedAt) {
+        this.deletedAt = deletedAt;
+    }
+
     public Club getClub() {
         return club;
     }
