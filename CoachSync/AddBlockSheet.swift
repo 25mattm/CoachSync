@@ -316,7 +316,7 @@ struct AddBlockSheet: View {
         case .paddleTimePieces, .runIntervals:
             return (perRepMinutes * 60 + perRepSeconds) > 0
         case .paddlePyramid:
-            return !pyramidDurationsSec.isEmpty
+            return !pyramidDurationsSec.isEmpty && pyramidDurationsSec.count <= maxPyramidRepsPerSet
         case .technique:
             return !drillName.trimmingCharacters(in: .whitespaces).isEmpty
         case .weights, .core, .circuit:
@@ -522,6 +522,10 @@ struct AddBlockSheet: View {
 
 // MARK: - TimeChipEditor
 
+/// With the 10-set stepper, this keeps a pyramid within the backend's 500-rep limit
+/// (`SessionBlock.MAX_PATTERN_LENGTH`, `MAX_SET_COUNT` and `MAX_REPETITION_COUNT`).
+private let maxPyramidRepsPerSet = 50
+
 /// Renders an array of duration chips with edit + remove controls.
 /// Used by paddle pyramid blocks.
 private struct TimeChipEditor: View {
@@ -551,6 +555,7 @@ private struct TimeChipEditor: View {
                     .foregroundStyle(Color.accentColor)
             }
             .buttonStyle(.plain)
+            .disabled(durationsSec.count >= maxPyramidRepsPerSet)
         }
         .padding(.vertical, 4)
     }

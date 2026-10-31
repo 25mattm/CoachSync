@@ -25,8 +25,8 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * CRUD for coach profiles, plus the operator side of the approval queue ({@link #pending} and
- * {@link #approve}; the coach-facing join side is {@code POST /api/clubs/join} on
+ * CRUD for coach profiles, plus the operator side of club membership ({@link #pending},
+ * {@link #approve} and {@link #remove}; the coach-facing join side is {@code POST /api/clubs/join} on
  * {@link ClubController}). {@code DELETE} is refused with 409 when the coach is
  * still attributed on any session, note, or journal entry
  * (see {@link com.coachsync.service.CoachService#delete}); reassign or remove
@@ -81,5 +81,11 @@ public class CoachController {
     @PostMapping("/{id}/approve")
     public CoachResponse approve(@PathVariable UUID id) {
         return CoachResponse.from(service.approve(id));
+    }
+
+    /** Operator-only: removes a coach from their club, revoking their access on their next request. */
+    @PostMapping("/{id}/remove")
+    public CoachResponse remove(@PathVariable UUID id) {
+        return CoachResponse.from(service.removeFromClub(id));
     }
 }

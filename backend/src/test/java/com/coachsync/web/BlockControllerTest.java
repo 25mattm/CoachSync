@@ -7,11 +7,13 @@ import com.coachsync.domain.CoachSession;
 import com.coachsync.domain.PerformanceRecord;
 import com.coachsync.domain.SessionBlock;
 import com.coachsync.domain.enums.AttendanceStatus;
+import com.coachsync.domain.enums.BlockType;
 import com.coachsync.repository.AthleteNoteRepository;
 import com.coachsync.repository.AthleteRepository;
 import com.coachsync.repository.AttendanceRecordRepository;
 import com.coachsync.repository.CoachSessionRepository;
 import com.coachsync.repository.PerformanceRecordRepository;
+import com.coachsync.repository.SessionBlockRepository;
 import com.jayway.jsonpath.JsonPath;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -53,6 +55,7 @@ class BlockControllerTest {
     @Autowired private AttendanceRecordRepository attendance;
     @Autowired private PerformanceRecordRepository performance;
     @Autowired private AthleteNoteRepository notes;
+    @Autowired private SessionBlockRepository blocks;
 
     private CoachSession newSession() {
         CoachSession s = new CoachSession();
@@ -231,5 +234,122 @@ class BlockControllerTest {
                         .content("{\"blockName\":\"\",\"blockType\":\"PADDLE_DISTANCE\"}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors.blockName").exists());
+    }
+
+    /** A block already in the database over the limit, as saved before the limit existed. */
+    private SessionBlock oversizedBlock(CoachSession session) {
+        SessionBlock block = new SessionBlock();
+        block.setSession(session);
+        block.setBlockName("Typo");
+        block.setBlockType(BlockType.PADDLE_DISTANCE);
+        block.setRepetitionCount(SessionBlock.MAX_REPETITION_COUNT + 1);
+        return blocks.save(block);
+    }
+
+    private void assertBlockRejected(UUID sessionId, String field, String json) throws Exception {
+        mvc.perform(post("/api/sessions/{sid}/blocks", sessionId)
+                        .contentType(MediaType.APPLICATION_JSON).content(json))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors['" + field + "']").exists());
+    }
+
+    @Test
+    void acceptsBlockAtEveryLimit() throws Exception {
+        CoachSession session = newSession();
+        String pattern = "3600,".repeat(SessionBlock.MAX_PATTERN_LENGTH - 1) + "3600";
+
+        createBlock(session.getId(), "{\"blockName\":\"Pyramid\",\"blockType\":\"PADDLE_PYRAMID\","
+                + "\"repetitionCount\":500,\"setCount\":10,\"prescribedRepDurationsSec\":[" + pattern + "]}");
+    }
+
+    @Test
+    void repetitionCountAboveLimitReturns400AndStoresNothing() throws Exception {
+        CoachSession session = newSession();
+        markPresent(session, newAthlete("Ivy"));
+
+        assertBlockRejected(session.getId(), "repetitionCount",
+                "{\"blockName\":\"Typo\",\"blockType\":\"PADDLE_DISTANCE\",\"repetitionCount\":2000000000}");
+        assertBlockRejected(session.getId(), "repetitionCount",
+                "{\"blockName\":\"Typo\",\"blockType\":\"PADDLE_DISTANCE\",\"repetitionCount\":501}");
+
+        assertTrue(blocks.findBySessionIdOrderBySortOrderAsc(session.getId()).isEmpty());
+    }
+
+    @Test
+    void updateCannotRaiseRepetitionCountAboveLimit() throws Exception {
+        CoachSession session = newSession();
+        String blockId = createBlock(session.getId(),
+                "{\"blockName\":\"8x200\",\"blockType\":\"PADDLE_DISTANCE\",\"repetitionCount\":3}");
+
+        mvc.perform(put("/api/blocks/{id}", blockId).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"blockName\":\"8x200\",\"blockType\":\"PADDLE_DISTANCE\",\"repetitionCount\":501}"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void setCountAboveLimitReturns400() throws Exception {
+        assertBlockRejected(newSession().getId(), "setCount",
+                "{\"blockName\":\"Pyramid\",\"blockType\":\"PADDLE_PYRAMID\",\"setCount\":11}");
+    }
+
+    @Test
+    void patternLongerThanLimitReturns400() throws Exception {
+        String pattern = "60,".repeat(SessionBlock.MAX_PATTERN_LENGTH) + "60";
+        assertBlockRejected(newSession().getId(), "prescribedRepDurationsSec",
+                "{\"blockName\":\"Pyramid\",\"blockType\":\"PADDLE_PYRAMID\","
+                        + "\"prescribedRepDurationsSec\":[" + pattern + "]}");
+    }
+
+    @Test
+    void patternDurationsAreValidated() throws Exception {
+        UUID sessionId = newSession().getId();
+        for (String bad : new String[]{"0", "-60", "3601", "null"}) {
+            assertBlockRejected(sessionId, "prescribedRepDurationsSec[1]",
+                    "{\"blockName\":\"Pyramid\",\"blockType\":\"PADDLE_PYRAMID\","
+                            + "\"prescribedRepDurationsSec\":[60," + bad + "]}");
+        }
+    }
+
+    @Test
+    void anExistingOversizedBlockDoesNotReconcileOrBlockTheSession() throws Exception {
+        CoachSession session = newSession();
+        Athlete athlete = newAthlete("Rae");
+        SessionBlock oversized = oversizedBlock(session);
+        String normal = createBlock(session.getId(),
+                "{\"blockName\":\"4x200\",\"blockType\":\"PADDLE_DISTANCE\",\"repetitionCount\":4,\"sortOrder\":1}");
+
+        mvc.perform(put("/api/sessions/{sid}/attendance", session.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"entries\":[{\"athleteId\":\"" + athlete.getId() + "\",\"status\":\"PRESENT\"}]}"))
+                .andExpect(status().isOk());
+
+        assertTrue(performance.findBySessionBlockId(oversized.getId()).isEmpty());
+        assertEquals(4, performance.findBySessionBlockId(UUID.fromString(normal)).size(),
+                "the session's other blocks still get their slots");
+    }
+
+    @Test
+    void anExistingOversizedBlockCanBeLoweredAndThenGetsItsSlots() throws Exception {
+        CoachSession session = newSession();
+        markPresent(session, newAthlete("Zed"));
+        SessionBlock oversized = oversizedBlock(session);
+
+        mvc.perform(put("/api/blocks/{id}", oversized.getId()).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"blockName\":\"Fixed\",\"blockType\":\"PADDLE_DISTANCE\",\"repetitionCount\":3}"))
+                .andExpect(status().isOk());
+
+        assertEquals(3, performance.findBySessionBlockId(oversized.getId()).size());
+    }
+
+    @Test
+    void anExistingOversizedBlockCanBeDeleted() throws Exception {
+        CoachSession session = newSession();
+        SessionBlock oversized = oversizedBlock(session);
+
+        em.flush();
+        em.clear();
+
+        mvc.perform(delete("/api/blocks/{id}", oversized.getId())).andExpect(status().isNoContent());
+        assertTrue(blocks.findById(oversized.getId()).isEmpty());
     }
 }

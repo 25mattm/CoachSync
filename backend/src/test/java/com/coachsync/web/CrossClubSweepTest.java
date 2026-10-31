@@ -248,6 +248,7 @@ class CrossClubSweepTest {
             Map.entry("POST /api/account/delete", "acts only on the caller's own coach; AccountDeletionTest"),
             Map.entry("POST /api/clubs", "operator-only (OperatorGuard); creates a new club"),
             Map.entry("POST /api/coaches/{id}/approve", "operator-only (OperatorGuard); cross-club by design"),
+            Map.entry("POST /api/coaches/{id}/remove", "operator-only (OperatorGuard); cross-club by design; CoachRemovalTest"),
             Map.entry("POST /api/clubs/join", "JoinFlowTest"),
             Map.entry("POST /api/athletes", "CreateByIdCollisionTest (body-supplied id collision)"),
             Map.entry("POST /api/sessions", "CreateByIdCollisionTest, RelationshipIsolationTest (foreign teamId)"),
