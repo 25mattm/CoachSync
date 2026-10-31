@@ -12,6 +12,8 @@ import com.coachsync.repository.AttendanceRecordRepository;
 import com.coachsync.repository.CoachSessionRepository;
 import com.coachsync.repository.PerformanceRecordRepository;
 import com.coachsync.repository.SessionBlockRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +37,8 @@ import java.util.UUID;
  */
 @Service
 public class SlotGenerationService {
+
+    private static final Logger log = LoggerFactory.getLogger(SlotGenerationService.class);
 
     private final PerformanceRecordRepository performanceRecords;
     private final AttendanceRecordRepository attendanceRecords;
@@ -93,6 +97,14 @@ public class SlotGenerationService {
     }
 
     private int reconcileBlock(SessionBlock block, List<Athlete> present, Set<UUID> presentIds) {
+        // BlockRequest refuses this now, but a row saved before that limit existed must not run the
+        // server out of memory. Skipped rather than refused, so the rest of the session still works
+        // and the block can be lowered or deleted.
+        if (slotCapacity(block) > SessionBlock.MAX_REPETITION_COUNT) {
+            log.warn("Skipping slot reconcile for block {}: repetitionCount {} is over the limit of {}",
+                    block.getId(), block.getRepetitionCount(), SessionBlock.MAX_REPETITION_COUNT);
+            return 0;
+        }
         SlotPlan plan = planBlock(block, present, presentIds, performanceRecords.findBySessionBlockId(block.getId()));
 
         // One batched DELETE and one batched INSERT (hibernate.jdbc.batch_size).
