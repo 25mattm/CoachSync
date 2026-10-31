@@ -5,3 +5,4 @@ COACHSYNC_BUNDLE_ID_PREFIX = com.yourname
 COACHSYNC_DEVELOPMENT_TEAM = ABCDE12345
 // "//" starts a comment in an xcconfig, hence the $() between the slashes.
 COACHSYNC_BACKEND_URL = https:/$()/coachsync.example.com
+COACHSYNC_PRIVACY_POLICY_URL = https:/$()/coachsync.example.com/privacy

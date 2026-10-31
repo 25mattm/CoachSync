@@ -112,17 +112,17 @@ struct AssessmentHistoryCard: View {
             HStack {
                 Label("Avg \(averageText)", systemImage: "star.fill")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.readableSecondary)
                 Spacer()
                 Text("\(assessment.ratings?.count ?? 0) factors")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.readableSecondary)
             }
 
             if let notes = assessment.overallNotes, !notes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 Text(notes)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.readableSecondary)
                     .lineLimit(3)
             }
         }

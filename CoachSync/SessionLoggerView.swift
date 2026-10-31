@@ -328,6 +328,7 @@ struct AttendancePhaseView: View {
                     .foregroundStyle(Color.accentColor)
                     .font(.caption)
                     .fontWeight(.semibold)
+                    .comfortableTapTarget()
                     .keyboardShortcut("p", modifiers: [.command, .option])
                     .accessibilityIdentifier("attendance.markAllPresentButton")
 
@@ -338,6 +339,7 @@ struct AttendancePhaseView: View {
                     .foregroundStyle(Color.accentColor)
                     .font(.caption)
                     .fontWeight(.semibold)
+                    .comfortableTapTarget()
                     .keyboardShortcut("a", modifiers: [.command, .shift])
                     .accessibilityIdentifier("attendance.markAllAbsentButton")
 
@@ -388,7 +390,7 @@ struct AttendanceToggleRow: View {
     @Binding var status: AttendanceStatus
 
     var body: some View {
-        HStack {
+        AdaptiveStack {
             VStack(alignment: .leading, spacing: 4) {
                 Text(athlete.fullName).font(.body)
                 HStack(spacing: 6) {
@@ -396,11 +398,11 @@ struct AttendanceToggleRow: View {
                     if let gender = athlete.gender {
                         Text(gender == .male ? "M" : "F")
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.readableSecondary)
                     }
                 }
             }
-            Spacer()
+            AdaptiveSpacer()
             Button { cycleStatus() } label: {
                 HStack(spacing: 6) {
                     Circle().fill(statusColor).frame(width: 8, height: 8)
@@ -413,8 +415,13 @@ struct AttendanceToggleRow: View {
                 .padding(.vertical, 7)
                 .background(statusColor.opacity(0.1))
                 .clipShape(Capsule())
+                .comfortableTapTarget()
             }
             .buttonStyle(.plain)
+            .accessibilityLabel("Attendance for \(athlete.fullName)")
+            .accessibilityValue(status.rawValue)
+            .accessibilityHint("Changes to the next status")
+            .accessibilityInputLabels([status.rawValue, "Attendance for \(athlete.fullName)"])
         }
         .padding(.vertical, 4)
     }
@@ -422,9 +429,9 @@ struct AttendanceToggleRow: View {
     /// Color used to represent the current `AttendanceStatus`.
     var statusColor: Color {
         switch status {
-        case .present: return .green
-        case .absent:  return .red
-        case .excused: return .orange
+        case .present: return .readableGreen
+        case .absent:  return .readableRed
+        case .excused: return .readableOrange
         }
     }
 
@@ -689,7 +696,7 @@ extension BlockEntryPhaseView {
                 guard !isGridActive,
                       let target = newValue, let old = oldValue,
                       old.athleteID != target.athleteID else { return }
-                withAnimation(.easeInOut(duration: 0.25)) {
+                withAnimation(Motion.animation(.easeInOut(duration: 0.25))) {
                     proxy.scrollTo(target.athleteID, anchor: .center)
                 }
             }
@@ -790,12 +797,12 @@ extension BlockEntryPhaseView {
                 GridRow {
                     Text("Athlete")
                         .font(.caption2).fontWeight(.semibold)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.readableSecondary)
                         .frame(width: Self.gridNameColumnWidth, alignment: .leading)
                     ForEach(1...blockRepCount, id: \.self) { rep in
                         Text("Rep \(rep)")
                             .font(.caption2).fontWeight(.semibold)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.readableSecondary)
                             .frame(width: Self.gridCellWidth)
                     }
                 }
@@ -808,6 +815,7 @@ extension BlockEntryPhaseView {
                         ForEach(1...blockRepCount, id: \.self) { rep in
                             TimeTextField(
                                 placeholder: "MM:SS",
+                                accessibilityName: "\(athlete.fullName), rep \(rep) time",
                                 text: Binding(
                                     get: { timeEntries[athlete.id]?[rep] ?? "" },
                                     set: { timeEntries[athlete.id, default: [:]][rep] = $0 }
@@ -894,13 +902,13 @@ private struct StructuralBlockCheckpoint: View {
                 Text(block.blockType.rawValue)
                     .font(.subheadline)
                     .fontWeight(.semibold)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.readableSecondary)
                 Spacer()
                 if let dur = block.durationSeconds, dur > 0 {
                     Text(formatDurationLabel(dur))
                         .font(.subheadline)
                         .fontWeight(.medium)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.readableSecondary)
                 }
             }
             Text(block.blockName)
@@ -913,7 +921,7 @@ private struct StructuralBlockCheckpoint: View {
             if let note = block.coachNote, !note.isEmpty {
                 Text(note)
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.readableSecondary)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -929,7 +937,7 @@ private struct StructuralBlockCheckpoint: View {
                 .foregroundStyle(.white)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 16)
-                .background(Color.green, in: RoundedRectangle(cornerRadius: 14))
+                .background(Color.filledGreen, in: RoundedRectangle(cornerRadius: 14))
         }
         .keyboardShortcut(.return, modifiers: [.command])
     }
@@ -947,8 +955,8 @@ private struct StructuralBlockCheckpoint: View {
     private var typeColor: Color {
         switch block.blockType {
         case .technique:      return .purple
-        case .weights, .core: return .orange
-        case .circuit:        return .red
+        case .weights, .core: return .readableOrange
+        case .circuit:        return .readableRed
         default:              return .secondary
         }
     }
@@ -1010,15 +1018,15 @@ struct BlockHeaderCard: View {
                         if block.repetitionCount > 1 {
                             Text("×\(block.repetitionCount)")
                                 .font(.caption)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(Color.readableSecondary)
                         }
                         if let dist = block.targetDistanceMetres {
                             // Plain String so Text can't apply locale number
                             // grouping ("1,000m") to the distance.
-                            let distanceLabel = dist >= 1000 ? "\(Int(dist / 1000))km" : "\(Int(dist))m"
+                            let distanceLabel = dist >= 1000 ? "\(Int(dist / 1000)) km" : "\(Int(dist)) m"
                             Text(distanceLabel)
                                 .font(.caption)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(Color.readableSecondary)
                         }
                     }
                 }
@@ -1041,14 +1049,14 @@ struct BlockHeaderCard: View {
                     HStack(spacing: 4) {
                         Image(systemName: distanceIconName)
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.readableSecondary)
                         Text(String(format: "%.2f km", km))
                             .font(.caption)
                             .foregroundStyle(block.trainingZone == .recovery ? .secondary : .primary)
                         if block.trainingZone == .recovery {
                             Text("(not counted)")
                                 .font(.caption2)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(Color.readableSecondary)
                         }
                     }
                 }
@@ -1056,17 +1064,17 @@ struct BlockHeaderCard: View {
                     HStack(spacing: 4) {
                         Image(systemName: "timer")
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.readableSecondary)
                         Text(restLabel(rest))
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.readableSecondary)
                     }
                 }
                 Spacer()
                 if let zone = block.trainingZone {
                     Text(zone.description)
                         .font(.caption2)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.readableSecondary)
                         .lineLimit(1)
                 }
             }
@@ -1088,22 +1096,22 @@ private struct CollapsedAthleteRow: View {
 
     var body: some View {
         Button(action: onExpand) {
-            HStack(spacing: 10) {
+            AdaptiveStack(spacing: 10) {
                 Image(systemName: "checkmark.circle.fill")
                     .font(.subheadline)
-                    .foregroundStyle(.green)
+                    .foregroundStyle(Color.readableGreen)
                 // Wraps rather than truncating ("Jorda…") at large text sizes; the name is the row.
                 Text(athlete.fullName)
                     .font(.subheadline).fontWeight(.medium)
                     .foregroundStyle(.primary)
                     .multilineTextAlignment(.leading)
-                Spacer()
+                AdaptiveSpacer()
                 Text(repCount == 1 ? "1 rep ✓" : "\(repCount) reps ✓")
                     .font(.caption)
-                    .foregroundStyle(.green)
+                    .foregroundStyle(Color.readableGreen)
                 Image(systemName: "chevron.down")
                     .font(.caption2)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.readableSecondary)
             }
             .padding(.horizontal, 14)
             .padding(.vertical, 10)
@@ -1132,6 +1140,10 @@ struct AthleteTimeEntryCard: View {
     @State private var showSaveError = false
     @State private var saveErrorMessage = ""
 
+    private var noteAccessibilityName: String {
+        hasNote ? "Edit note for \(athlete.fullName)" : "Add note for \(athlete.fullName)"
+    }
+
     /// True when a session-level note already exists for this athlete.
     private var hasNote: Bool {
         (session.athleteNotes ?? []).contains { $0.athlete?.id == athlete.id }
@@ -1147,7 +1159,7 @@ struct AthleteTimeEntryCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            HStack {
+            AdaptiveStack {
                 Circle()
                     .fill(Color.accentColor.opacity(0.1))
                     .frame(width: 34, height: 34)
@@ -1164,19 +1176,19 @@ struct AthleteTimeEntryCard: View {
                     if let gender = athlete.gender {
                         Text(gender == .male ? "M" : "F")
                             .font(.caption2)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.readableSecondary)
                     }
                 }
-                Spacer()
+                AdaptiveSpacer()
                 if let pb = pbMs {
                     VStack(alignment: .trailing, spacing: 1) {
                         Text("PB")
                             .font(.caption2)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.readableSecondary)
                         Text(formatMillisecondsForDisplay(pb))
                             .font(.caption)
                             .fontWeight(.semibold)
-                            .foregroundStyle(.green)
+                            .foregroundStyle(Color.readableGreen)
                     }
                 }
                 CategoryPill(category: athlete.ageCategory)
@@ -1184,9 +1196,13 @@ struct AthleteTimeEntryCard: View {
                     showingNoteSheet = true
                 } label: {
                     Image(systemName: hasNote ? "note.text" : "note.text.badge.plus")
-                        .foregroundStyle(hasNote ? .blue : .secondary)
+                        .foregroundStyle(hasNote ? Color.readableBlue : .secondary)
+                        .frame(minWidth: 44, minHeight: 44)
+                        .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel(noteAccessibilityName)
+                .accessibilityInputLabels(["Note", noteAccessibilityName])
             }
 
             if !block.requiresTimeEntry {
@@ -1195,6 +1211,7 @@ struct AthleteTimeEntryCard: View {
                 HStack(spacing: 8) {
                     TimeTextField(
                         placeholder: "MM:SS.ms",   // DNS / DNF have their own chips right beside the field
+                        accessibilityName: "\(athlete.fullName), time",
                         text: Binding(
                             get: { entries[1] ?? "" },
                             set: { entries[1] = $0 }
@@ -1212,9 +1229,10 @@ struct AthleteTimeEntryCard: View {
                         VStack(alignment: .leading, spacing: 4) {
                             Text("Rep \(rep)")
                                 .font(.caption2)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(Color.readableSecondary)
                             TimeTextField(
                                 placeholder: "MM:SS",
+                                accessibilityName: "\(athlete.fullName), rep \(rep) time",
                                 text: Binding(
                                     get: { entries[rep] ?? "" },
                                     set: { entries[rep] = $0 }
@@ -1260,7 +1278,7 @@ struct AthleteTimeEntryCard: View {
                 .padding(.horizontal, 8)
                 .padding(.vertical, 4)
                 .background(Color.orange.opacity(0.12), in: Capsule())
-                .foregroundStyle(.orange)
+                .foregroundStyle(Color.readableOrange)
         }
         .buttonStyle(.plain)
         .accessibilityLabel(
@@ -1282,7 +1300,7 @@ struct AthleteTimeEntryCard: View {
                             Text("Set \(setIndex + 1)")
                                 .font(.caption2)
                                 .fontWeight(.semibold)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(Color.readableSecondary)
                         }
                         LazyVGrid(
                             columns: [GridItem(.adaptive(minimum: 56, maximum: 72), spacing: 6)],
@@ -1386,7 +1404,7 @@ private struct RepCheckbox: View {
             if let label = prescribedLabel {
                 Text(label)
                     .font(.caption2)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.readableSecondary)
             }
             Button(action: onToggle) {
                 statusContent
@@ -1398,7 +1416,8 @@ private struct RepCheckbox: View {
                     )
             }
             .buttonStyle(.plain)
-            .accessibilityLabel("Rep \(rep), \(status.rawValue)")
+            .accessibilityLabel("Rep \(rep)")
+            .accessibilityValue(status.rawValue)
             .contextMenu {
                 Button {
                     onSetStatus(.complete)
@@ -1437,15 +1456,15 @@ private struct RepCheckbox: View {
         case .pending:
             Text("\(rep)")
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.readableSecondary)
         }
     }
 
     private var background: Color {
         switch status {
-        case .complete: return .green
-        case .dns:      return .red
-        case .dnf:      return .orange
+        case .complete: return .filledGreen
+        case .dns:      return .filledRed
+        case .dnf:      return .filledOrange
         case .pending:  return .clear
         }
     }
@@ -1592,6 +1611,8 @@ func isLoggableEntryText(_ text: String) -> Bool {
 /// to another `FocusField` moves focus; setting it to nil dismisses the keyboard.
 struct TimeTextField: View {
     let placeholder: String
+    /// Spoken name, e.g. "Jordan Rivers, rep 2 time". The placeholder is the same on every field.
+    let accessibilityName: String
     @Binding var text: String
     let onCommit: () -> Void
     let focusID: FocusField
@@ -1615,6 +1636,7 @@ struct TimeTextField: View {
 
     var body: some View {
         TextField(placeholder, text: $text)
+            .accessibilityLabel(accessibilityName)
             .font(.system(.body, design: .monospaced))
             #if os(iOS)
             .keyboardType(.numbersAndPunctuation)
@@ -1680,14 +1702,14 @@ struct SessionSummaryPhaseView: View {
 
     /// Headline numbers for the attendance card; Excused and km appear only when non-zero.
     private var attendanceStats: [StatStripItem] {
-        var items = [StatStripItem(value: "\(totalPresent)", label: "Present", color: .green),
-                     StatStripItem(value: "\(totalAbsent)", label: "Absent", color: .red)]
+        var items = [StatStripItem(value: "\(totalPresent)", label: "Present", color: .readableGreen),
+                     StatStripItem(value: "\(totalAbsent)", label: "Absent", color: .readableRed)]
         if totalExcused > 0 {
-            items.append(StatStripItem(value: "\(totalExcused)", label: "Excused", color: .orange))
+            items.append(StatStripItem(value: "\(totalExcused)", label: "Excused", color: .readableOrange))
         }
         items.append(StatStripItem(value: "\(totalAthletes)", label: "Total", color: .accentColor))
         if sessionKm > 0 {
-            items.append(StatStripItem(value: String(format: "%.1f", sessionKm), label: "km", color: .orange))
+            items.append(StatStripItem(value: String(format: "%.1f", sessionKm), label: "km", color: .readableOrange))
         }
         return items
     }
@@ -1713,13 +1735,13 @@ struct SessionSummaryPhaseView: View {
                     Text(session.sessionName)
                         .font(.title2).fontWeight(.bold)
                     if let team = session.team {
-                        Text(team.teamName).foregroundStyle(.secondary)
+                        Text(team.teamName).foregroundStyle(Color.readableSecondary)
                     }
                     if let cue = session.mfCue {
                         HStack(spacing: 6) {
                             Text("MF Cue")
                                 .font(.caption)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(Color.readableSecondary)
                             Text(cue)
                                 .font(.caption)
                                 .fontWeight(.medium)
@@ -1731,8 +1753,9 @@ struct SessionSummaryPhaseView: View {
 
                 VStack(alignment: .leading, spacing: 12) {
                     Label("Attendance", systemImage: "person.2.fill")
+                        .labelStyle(AdaptiveLabelStyle())
                         .font(.subheadline).fontWeight(.semibold)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.readableSecondary)
                     StatStrip(items: attendanceStats)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -1742,7 +1765,7 @@ struct SessionSummaryPhaseView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Label("Practice Notes", systemImage: "note.text")
                         .font(.subheadline).fontWeight(.semibold)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.readableSecondary)
                     TextField("General observations…", text: Binding(
                         get: { session.sessionNote ?? "" },
                         set: { session.sessionNote = $0.isEmpty ? nil : $0 }
@@ -1754,20 +1777,22 @@ struct SessionSummaryPhaseView: View {
                 .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14))
 
                 VStack(alignment: .leading, spacing: 12) {
-                    HStack {
+                    AdaptiveStack {
                         Label("Workout Blocks", systemImage: "stopwatch.fill")
+                            .labelStyle(AdaptiveLabelStyle())
                             .font(.subheadline).fontWeight(.semibold)
-                            .foregroundStyle(.secondary)
-                        Spacer()
+                            .foregroundStyle(Color.readableSecondary)
+                        AdaptiveSpacer()
                         Button { onAddBlock() } label: {
                             Label("Add Block", systemImage: "plus")
                                 .font(.caption).fontWeight(.semibold)
+                                .comfortableTapTarget()
                         }
                     }
 
                     if sortedBlocks.isEmpty {
                         Text("No blocks — tap Add Block to log workout data")
-                            .font(.subheadline).foregroundStyle(.secondary)
+                            .font(.subheadline).foregroundStyle(Color.readableSecondary)
                     } else {
                         VStack(spacing: 8) {
                             ForEach(sortedBlocks) { block in
@@ -1784,7 +1809,7 @@ struct SessionSummaryPhaseView: View {
                     VStack(alignment: .leading, spacing: 10) {
                         Label("Zone Distribution", systemImage: "chart.bar.fill")
                             .font(.subheadline).fontWeight(.semibold)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.readableSecondary)
 
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: 8) {
@@ -1794,7 +1819,7 @@ struct SessionSummaryPhaseView: View {
                                             .font(.caption2).fontWeight(.semibold)
                                             .foregroundStyle(item.zone.color)
                                         Text(item.zone.description)
-                                            .font(.caption2).foregroundStyle(.secondary)
+                                            .font(.caption2).foregroundStyle(Color.readableSecondary)
                                             .lineLimit(2)
                                         Text(String(format: "%.1f km", item.km))
                                             .font(.caption).foregroundStyle(.primary)
@@ -1827,7 +1852,7 @@ struct SessionSummaryPhaseView: View {
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
-                    .background(isCompleting ? Color.green.opacity(0.7) : Color.green)
+                    .background(isCompleting ? Color.filledGreen.opacity(0.7) : Color.filledGreen)
                     .clipShape(RoundedRectangle(cornerRadius: 14))
                 }
                 .disabled(isCompleting)
@@ -1893,7 +1918,7 @@ struct BlockSummaryRow: View {
             VStack(alignment: .leading, spacing: 3) {
                 Text(block.blockName).font(.subheadline)
                 detailsLayout {
-                    Text(block.blockType.rawValue).font(.caption).foregroundStyle(.secondary)
+                    Text(block.blockType.rawValue).font(.caption).foregroundStyle(Color.readableSecondary)
                     if let zone = block.trainingZone {
                         Text(zone.rawValue)
                             .font(.caption2)
@@ -1903,16 +1928,16 @@ struct BlockSummaryRow: View {
                             .clipShape(Capsule())
                     }
                     if let km = blockKm, block.trainingZone != .recovery {
-                        Text(String(format: "%.2fkm", km))
+                        Text(String(format: "%.2f km", km))
                             .font(.caption2)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.readableSecondary)
                     }
                 }
             }
             if !dynamicTypeSize.isAccessibilitySize { Spacer() }
             Text("\(recordedCount)/\(presentCount) recorded")
                 .font(.caption)
-                .foregroundStyle(recordedCount == presentCount ? .green : .orange)
+                .foregroundStyle(recordedCount == presentCount ? Color.readableGreen : Color.readableOrange)
         }
         .padding(.vertical, 4)
     }

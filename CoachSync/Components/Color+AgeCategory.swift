@@ -6,12 +6,12 @@ extension Color {
     /// Returns the accent color associated with an age category.
     static func ageCategory(_ category: String) -> Color {
         switch category {
-        case "U10": return .purple
-        case "U12": return .blue
-        case "U14": return .green
-        case "U16": return .orange
-        case "U18": return .red
-        default:    return .gray
+        case "U10": return .readablePurple
+        case "U12": return .readableBlue
+        case "U14": return .readableGreen
+        case "U16": return .readableOrange
+        case "U18": return .readableRed
+        default:    return .readableGray
         }
     }
 }

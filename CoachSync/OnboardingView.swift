@@ -62,13 +62,22 @@ struct CoachAvatarChip: View {
     let initials: String
     let color: Color
     var size: CGFloat = 28
+    @Environment(\.self) private var environment
+
+    /// A coach can pick any color, so the initials switch to black on a light one.
+    private var initialsColor: Color {
+        let c = color.resolve(in: environment)
+        let luminance = 0.2126 * c.linearRed + 0.7152 * c.linearGreen + 0.0722 * c.linearBlue
+        return luminance > 0.18 ? .black : .white
+    }
 
     var body: some View {
         Text(initials)
             .font(.system(size: size * 0.42, weight: .semibold))
-            .foregroundStyle(.white)
+            .foregroundStyle(initialsColor)
             .frame(width: size, height: size)
             .background(Circle().fill(color))
+            .accessibilityHidden(true)   // Decorative: the coach's name is always beside it.
     }
 }
 
@@ -83,7 +92,7 @@ struct LoggedByLabel: View {
         if let name = coachName, !name.isEmpty {
             Label("Logged by \(name)", systemImage: "person.fill")
                 .font(.caption2)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.readableSecondary)
         }
     }
 }
@@ -241,12 +250,17 @@ struct OnboardingView: View {
                 .font(.title2).bold()
             Text("Sign in with Apple to join your club.")
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.readableSecondary)
                 .multilineTextAlignment(.center)
             SignInWithAppleButtonView()
                 .frame(maxWidth: 320)
+            if let policy = BackendConfig.privacyPolicyURL {
+                Link("Privacy Policy", destination: policy)
+                    .font(.footnote)
+                    .comfortableTapTarget()
+            }
             if let error = auth.errorMessage {
-                Text(error).font(.caption).foregroundStyle(.red)
+                Text(error).font(.caption).foregroundStyle(Color.readableRed)
             }
         }
         .padding()
@@ -271,7 +285,7 @@ struct OnboardingView: View {
                     if let name = auth.currentSession?.coach.name {
                         Text("Signed in as \(name).")
                             .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.readableSecondary)
                     }
                 }
                 .padding(.vertical, 4)
@@ -296,7 +310,7 @@ struct OnboardingView: View {
                 }
                 .disabled(joinCode.trimmingCharacters(in: .whitespaces).isEmpty || isSubmittingJoinCode)
                 if let joinStatusMessage {
-                    Text(joinStatusMessage).font(.caption).foregroundStyle(.secondary)
+                    Text(joinStatusMessage).font(.caption).foregroundStyle(Color.readableSecondary)
                 }
             }
 
@@ -304,7 +318,7 @@ struct OnboardingView: View {
                 Text("Ask your club administrator for a join code. Once they approve you, sign in "
                      + "again below to continue.")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.readableSecondary)
                 SignInWithAppleButtonView()
                 Button("Sign Out", role: .destructive) {
                     auth.signOut()
@@ -347,7 +361,7 @@ struct OnboardingView: View {
                         .font(.title2).bold()
                     Text("This name appears throughout CoachSync. You can change it later in Settings.")
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.readableSecondary)
                 }
                 .padding(.vertical, 4)
             }
@@ -400,7 +414,7 @@ struct OnboardingView: View {
             ProgressView()
             Text("Checking for your club's coaches…")
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.readableSecondary)
             Button("Set up a new profile") { didWaitForCoachSync = true }
                 .buttonStyle(.bordered)
         }
@@ -421,7 +435,7 @@ struct OnboardingView: View {
                         .font(.title2).bold()
                     Text("Your profile tags the sessions and notes you log so the club can see who recorded what.")
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.readableSecondary)
                 }
                 .padding(.vertical, 4)
             }
@@ -461,7 +475,7 @@ struct OnboardingView: View {
                             VStack(alignment: .leading) {
                                 Text(coach.name).foregroundStyle(.primary)
                                 if let role = coach.role, !role.isEmpty {
-                                    Text(role).font(.caption).foregroundStyle(.secondary)
+                                    Text(role).font(.caption).foregroundStyle(Color.readableSecondary)
                                 }
                             }
                             Spacer()

@@ -4,6 +4,7 @@ import com.coachsync.auth.ClubTenantResolver;
 import com.coachsync.auth.OperatorGuard;
 import com.coachsync.domain.Club;
 import com.coachsync.domain.Coach;
+import com.coachsync.domain.Timestamps;
 import com.coachsync.repository.AthleteNoteRepository;
 import com.coachsync.repository.ClubRepository;
 import com.coachsync.repository.CoachRepository;
@@ -27,6 +28,9 @@ import java.util.UUID;
  */
 @Service
 public class CoachService {
+
+    /** Shown wherever a deleted coach is still attributed on club history. */
+    static final String DELETED_COACH_NAME = "Former coach";
 
     private final CoachRepository coaches;
     private final CoachSessionRepository sessions;
@@ -85,6 +89,7 @@ public class CoachService {
                 if (!inCurrentClub(managed)) {
                     throw new ConflictException("A coach with id " + request.id() + " already exists.");
                 }
+                refuseIfDeleted(managed);
                 if (SyncTimestamps.isStale(managed, request.updatedAt())) {
                     return managed;  // re-sent insert is older than the stored row — last-write-wins
                 }
@@ -106,6 +111,7 @@ public class CoachService {
     @Transactional
     public Coach update(UUID id, CoachRequest request) {
         Coach coach = get(id);   // 404s across clubs before any write
+        refuseIfDeleted(coach);
         if (SyncTimestamps.isStale(coach, request.updatedAt())) {
             return coach;
         }
@@ -135,6 +141,54 @@ public class CoachService {
                     + "entries and cannot be deleted; reassign or remove them first.");
         }
         coaches.delete(coach);
+    }
+
+    /**
+     * Deletes the caller's own account. The sign-in identity and personal details always go. A coach
+     * attributed on the club's sessions, notes or journal entries keeps an anonymous row so that club
+     * history survives; one with nothing attributed is removed outright. Clearing
+     * {@code appleUserId} revokes every outstanding token ({@code ActiveCoachFilter}), and signing in
+     * again later provisions a brand-new coach with no club. Stamping {@code updatedAt} is what makes
+     * clubmates' devices take the change on their next pull.
+     */
+    @Transactional
+    public void deleteOwnAccount() {
+        Coach coach = currentCoach();
+        UUID id = coach.getId();
+        if (sessions.existsByCoachId(id) || notes.existsByCoachId(id) || journal.existsByCoachId(id)) {
+            coach.setName(DELETED_COACH_NAME);
+            coach.setAppleUserId(null);
+            coach.setEmail(null);
+            coach.setRole(null);
+            coach.setNccpLevel(null);
+            coach.setColorHex(null);
+            coach.setRequestedClub(null);
+            coach.setDeletedAt(Timestamps.now());
+            coach.setUpdatedAt(coach.getDeletedAt());
+            coaches.save(coach);
+        } else {
+            coaches.delete(coach);
+        }
+    }
+
+    /** The caller's Apple identity, to check a deletion's authorization against. */
+    @Transactional(readOnly = true)
+    public String currentCoachAppleUserId() {
+        return currentCoach().getAppleUserId();
+    }
+
+    private Coach currentCoach() {
+        UUID id = tenant.currentCoachId()
+                .orElseThrow(() -> new ForbiddenException("Only a signed-in coach can delete their account."));
+        return coaches.findById(id)
+                .orElseThrow(() -> new NotFoundException("No coach with id " + id));
+    }
+
+    /** A clubmate's device still holding a deleted coach must not be able to write them back. */
+    private static void refuseIfDeleted(Coach coach) {
+        if (coach.getDeletedAt() != null) {
+            throw new ConflictException("Coach " + coach.getId() + " has deleted their account.");
+        }
     }
 
     /**

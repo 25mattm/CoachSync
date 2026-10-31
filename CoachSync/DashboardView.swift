@@ -99,7 +99,7 @@ struct DashboardView: View {
                         ForEach(todaysSessions) { session in
                             Button { sessionToLog = session } label: {
                                 SessionCard(session: session)
-                                    .transition(.move(edge: .trailing).combined(with: .opacity))
+                                    .transition(.slideAndFade(.trailing))
                             }
                             .buttonStyle(.plain)
                             .accessibilityIdentifier("dashboard.todaySessionCard")
@@ -111,14 +111,14 @@ struct DashboardView: View {
                         ForEach(unloggedSessions.prefix(3)) { session in
                             Button { sessionToLog = session } label: {
                                 RecentCard(session: session)
-                                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                                    .transition(.slideAndFade(.bottom))
                             }
                             .buttonStyle(.plain)
                         }
                         if unloggedSessions.count > 3 {
                             Text("+ \(unloggedSessions.count - 3) more on the Schedule")
                                 .font(.caption)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(Color.readableSecondary)
                         }
                     }
 
@@ -132,8 +132,8 @@ struct DashboardView: View {
                                             Button { sessionToLog = session } label: {
                                                 UpcomingChip(session: session)
                                                     .transition(.asymmetric(
-                                                        insertion: .move(edge: .trailing).combined(with: .opacity),
-                                                        removal: .move(edge: .leading).combined(with: .opacity)
+                                                        insertion: .slideAndFade(.trailing),
+                                                        removal: .slideAndFade(.leading)
                                                     ))
                                             }
                                             .buttonStyle(.plain)
@@ -151,8 +151,8 @@ struct DashboardView: View {
                                         Button { sessionToLog = session } label: {
                                             UpcomingChip(session: session)
                                                 .transition(.asymmetric(
-                                                    insertion: .move(edge: .trailing).combined(with: .opacity),
-                                                    removal: .move(edge: .leading).combined(with: .opacity)
+                                                    insertion: .slideAndFade(.trailing),
+                                                    removal: .slideAndFade(.leading)
                                                 ))
                                         }
                                         .buttonStyle(.plain)
@@ -173,7 +173,7 @@ struct DashboardView: View {
                         ForEach(completedSessions.prefix(3)) { session in
                             Button { sessionToLog = session } label: {
                                 RecentCard(session: session)
-                                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                                    .transition(.slideAndFade(.bottom))
                             }
                             .buttonStyle(.plain)
                         }
@@ -254,12 +254,12 @@ struct SessionCard: View {
                     if let team = session.team {
                         Text(team.teamName)
                             .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.readableSecondary)
                     }
                     if let cue = session.mfCue {
                         Text(cue)
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.readableSecondary)
                             .italic()
                     }
                 }
@@ -274,7 +274,7 @@ struct SessionCard: View {
                         systemImage: "clock"
                     )
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.readableSecondary)
                 }
                 HStack(spacing: 4) {
                     Image(systemName: "person.2")
@@ -283,7 +283,7 @@ struct SessionCard: View {
                     Text(athleteCount == 1 ? "athlete" : "athletes")
                 }
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.readableSecondary)
                 .animation(.snappy, value: athleteCount)
                 if !dynamicTypeSize.isAccessibilitySize {
                     Spacer()
@@ -295,7 +295,7 @@ struct SessionCard: View {
                     Image(systemName: "chevron.right")
                         .font(.caption2)
                 }
-                .foregroundStyle(.blue.opacity(0.8))
+                .foregroundStyle(Color.readableBlue)
             }
         }
         .padding(16)
@@ -323,7 +323,7 @@ struct UpcomingChip: View {
         VStack(alignment: .leading, spacing: 6) {
             Text(session.scheduledDate.formatted(.dateTime.month(.abbreviated).day()))
                 .font(.caption2)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.readableSecondary)
             Text(session.sessionName)
                 .font(.caption)
                 .fontWeight(.medium)
@@ -331,7 +331,7 @@ struct UpcomingChip: View {
             if let team = session.team {
                 Text(team.teamName)
                     .font(.caption2)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.readableSecondary)
             }
         }
         .frame(width: 130, alignment: .leading)
@@ -395,7 +395,7 @@ struct RecentCard: View {
                 if let team = session.team {
                     Text(team.teamName)
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.readableSecondary)
                 }
             }
             Spacer()
@@ -403,12 +403,12 @@ struct RecentCard: View {
                 VStack(alignment: .trailing, spacing: 4) {
                     Text(session.scheduledDate.formatted(.dateTime.month(.abbreviated).day()))
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.readableSecondary)
                     StatusPill(status: session.status)
                 }
                 Image(systemName: "chevron.right")
                     .font(.caption2)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.readableSecondary)
             }
         }
         .padding(14)
@@ -479,7 +479,7 @@ struct NeedsAttentionSection: View {
                         .padding(.horizontal, 8)
                         .padding(.vertical, 2)
                         .background(Color.orange.opacity(0.15))
-                        .foregroundStyle(.orange)
+                        .foregroundStyle(Color.readableOrange)
                         .clipShape(Capsule())
                     Spacer()
                 }
@@ -500,18 +500,18 @@ struct NeedsAttentionSection: View {
                     NavigationLink(destination: AthleteProfileView(athlete: alert.athlete)) {
                         HStack(spacing: 12) {
                             Image(systemName: "exclamationmark.circle.fill")
-                                .foregroundStyle(.orange)
+                                .foregroundStyle(Color.readableOrange)
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(alert.athlete.fullName)
                                     .font(.subheadline).fontWeight(.medium)
                                 Text(alert.firstSignal)
                                     .font(.caption)
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(Color.readableSecondary)
                             }
                             Spacer()
                             Image(systemName: "chevron.right")
                                 .font(.caption2)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(Color.readableSecondary)
                         }
                         .padding(12)
                         .background(

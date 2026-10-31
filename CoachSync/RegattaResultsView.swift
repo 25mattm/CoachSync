@@ -197,7 +197,7 @@ struct RegattaResultCard: View {
                         .padding(.horizontal, 8)
                         .padding(.vertical, 3)
                         .background(Color.yellow.opacity(0.2))
-                        .foregroundStyle(.orange)
+                        .foregroundStyle(Color.readableOrange)
                         .clipShape(Capsule())
                 }
             }
@@ -205,11 +205,11 @@ struct RegattaResultCard: View {
             HStack {
                 Text(result.regattaDate.formatted(.dateTime.month(.abbreviated).day().year()))
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.readableSecondary)
                 if let location = result.location, !location.isEmpty {
                     Text("• \(location)")
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.readableSecondary)
                 }
             }
 
@@ -218,7 +218,7 @@ struct RegattaResultCard: View {
                 // and renders 1000 as "1,000".
                 Text("\(String(result.eventDistance))m")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.readableSecondary)
                 Spacer()
                 Text(result.formattedTime)
                     .font(.subheadline)
@@ -229,7 +229,7 @@ struct RegattaResultCard: View {
             if let placementText {
                 Text(placementText)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.readableSecondary)
             }
         }
         .padding(14)
@@ -325,7 +325,7 @@ struct NewRegattaResultSheet: View {
                     if !timeText.isEmpty && parsedTimeMs == nil {
                         Text("Enter a valid time format (e.g. 1:52.34)")
                             .font(.caption)
-                            .foregroundStyle(.red)
+                            .foregroundStyle(Color.readableRed)
                     }
                 }
 
@@ -341,7 +341,7 @@ struct NewRegattaResultSheet: View {
                     if let placementValidationMessage {
                         Text(placementValidationMessage)
                             .font(.caption)
-                            .foregroundStyle(.red)
+                            .foregroundStyle(Color.readableRed)
                     }
                 }
 

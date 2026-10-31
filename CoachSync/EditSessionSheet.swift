@@ -164,7 +164,7 @@ struct EditSessionSheet: View {
                         session.mfCue = nil
                     } label: {
                         Image(systemName: "xmark.circle.fill")
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.readableSecondary)
                     }
                     .buttonStyle(.plain)
                 }
@@ -178,7 +178,7 @@ struct EditSessionSheet: View {
             if teams.isEmpty {
                 Text("No teams yet")
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.readableSecondary)
             } else {
                 Picker("Team", selection: $session.team) {
                     Text("All Athletes").tag(nil as Team?)
@@ -203,7 +203,7 @@ struct EditSessionSheet: View {
             if sortedBlocks.isEmpty {
                 Text("No blocks yet — tap Add Block to plan the workout")
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.readableSecondary)
             } else {
                 ForEach(sortedBlocks) { block in
                     Button { blockToEdit = block } label: {

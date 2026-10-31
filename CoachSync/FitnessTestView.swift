@@ -170,7 +170,7 @@ struct FitnessTestView: View {
         Text(group.testType)
             .font(.footnote)
             .fontWeight(.semibold)
-            .foregroundStyle(.secondary)
+            .foregroundStyle(Color.readableSecondary)
             .listRowBackground(Color.clear)
             .listRowSeparator(.hidden)
             .padding(.top, 4)
@@ -223,7 +223,7 @@ private struct TestingWindowBanner: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text("Next CKC Testing Window")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.readableSecondary)
                 Text(nextTestingWindowLabel())
                     .font(.subheadline)
                     .fontWeight(.semibold)
@@ -250,12 +250,12 @@ struct FitnessResultRow: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(result.testDate.formatted(.dateTime.month(.abbreviated).day().year()))
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.readableSecondary)
 
                 if let notes = result.notes, !notes.isEmpty {
                     Text(notes)
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.readableSecondary)
                         .lineLimit(2)
                 }
             }
@@ -270,7 +270,7 @@ struct FitnessResultRow: View {
                         .padding(.horizontal, 8)
                         .padding(.vertical, 3)
                         .background(Color.yellow.opacity(0.2))
-                        .foregroundStyle(.orange)
+                        .foregroundStyle(Color.readableOrange)
                         .clipShape(Capsule())
                 }
 
@@ -318,7 +318,7 @@ struct CKCTrendFooter: View {
         HStack {
             Text("Trend")
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.readableSecondary)
             Spacer()
             if let info = trendInfo {
                 Text(info.label)
@@ -328,7 +328,7 @@ struct CKCTrendFooter: View {
             } else {
                 Text("Log 2+ results to see trend")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.readableSecondary)
             }
         }
         .padding(12)
@@ -372,7 +372,7 @@ struct FitnessBenchmarkFooter: View {
                 HStack {
                     Text("LTAD Benchmark")
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.readableSecondary)
                     Spacer()
                     Text(formatSecondsForDisplay(benchmark))
                         .font(.caption)
@@ -384,7 +384,7 @@ struct FitnessBenchmarkFooter: View {
                         HStack {
                             Text("Best vs Benchmark")
                                 .font(.caption)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(Color.readableSecondary)
                             Spacer()
                             Text(String(format: "%.1f%%", percent))
                                 .font(.caption)
@@ -408,14 +408,14 @@ struct FitnessBenchmarkFooter: View {
                 } else {
                     Text("Log a result to compare against the benchmark")
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.readableSecondary)
                 }
             } else {
                 Text(athlete.gender == nil
                      ? "Set athlete gender to see LTAD benchmark."
                      : "No LTAD benchmark available for this test type.")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.readableSecondary)
             }
         }
         .padding(12)
@@ -511,7 +511,7 @@ struct NewFitnessTestResultSheet: View {
                         if !timeEntry.isEmpty && parsedMs == nil {
                             Text("Enter a valid time (e.g. 8:52.30 or 34.12)")
                                 .font(.caption)
-                                .foregroundStyle(.red)
+                                .foregroundStyle(Color.readableRed)
                         }
                     }
                 } else {
@@ -523,7 +523,7 @@ struct NewFitnessTestResultSheet: View {
                         if !numericEntry.isEmpty && parsedNumeric == nil {
                             Text("Enter a valid number")
                                 .font(.caption)
-                                .foregroundStyle(.red)
+                                .foregroundStyle(Color.readableRed)
                         }
                     }
                 }

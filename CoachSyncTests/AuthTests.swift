@@ -170,6 +170,65 @@ final class AuthManagerTests: XCTestCase {
     }
 
     @MainActor
+    func testDeleteAccountSignsOutOnSuccess() async {
+        StubURLProtocol.respond(status: 200, json: sampleAuthJSON)
+        let store = InMemoryTokenStore()
+        let auth = makeManager(store: store)
+        await auth.signIn(identityToken: "apple-token", displayName: "Pat")
+        StubURLProtocol.respond(status: 204, json: "")
+
+        let failure = await auth.deleteAccount(authorizationCode: "code", clientId: "com.example.CoachSync")
+
+        XCTAssertNil(failure)
+        XCTAssertNil(auth.currentSession)
+        XCTAssertNil(store.load())
+    }
+
+    /// A dead session can mean an earlier delete worked but its reply was lost, so a retry must not
+    /// claim the account wasn't deleted, and the coach can't stay signed in on a dead token.
+    @MainActor
+    func testDeleteAccountWithADeadSessionSignsOutAndSaysItCannotConfirm() async {
+        StubURLProtocol.respond(status: 200, json: sampleAuthJSON)
+        let auth = makeManager(store: InMemoryTokenStore())
+        await auth.signIn(identityToken: "apple-token", displayName: "Pat")
+        StubURLProtocol.respond(status: 401, json: "")
+
+        let failure = await auth.deleteAccount(authorizationCode: "code", clientId: "com.example.CoachSync")
+
+        XCTAssertNil(auth.currentSession)
+        XCTAssertEqual(failure?.contains("can't confirm"), true)
+    }
+
+    @MainActor
+    func testDeleteAccountRefusedByAppleStaysSignedIn() async {
+        StubURLProtocol.respond(status: 200, json: sampleAuthJSON)
+        let auth = makeManager(store: InMemoryTokenStore())
+        await auth.signIn(identityToken: "apple-token", displayName: "Pat")
+        StubURLProtocol.respond(status: 403, json: "")
+
+        let failure = await auth.deleteAccount(authorizationCode: "code", clientId: "com.example.CoachSync")
+
+        XCTAssertNotNil(auth.currentSession)
+        XCTAssertEqual(failure?.contains("Apple couldn't confirm"), true)
+    }
+
+    /// A failed delete must leave the coach signed in: they still have an account, and need to retry.
+    @MainActor
+    func testDeleteAccountStaysSignedInOnFailure() async {
+        StubURLProtocol.respond(status: 200, json: sampleAuthJSON)
+        let store = InMemoryTokenStore()
+        let auth = makeManager(store: store)
+        await auth.signIn(identityToken: "apple-token", displayName: "Pat")
+        StubURLProtocol.respond(status: 500, json: "")
+
+        let failure = await auth.deleteAccount(authorizationCode: "code", clientId: "com.example.CoachSync")
+
+        XCTAssertNotNil(failure)
+        XCTAssertNotNil(auth.currentSession)
+        XCTAssertNotNil(store.load())
+    }
+
+    @MainActor
     func testSignInFailureSetsErrorAndStaysSignedOut() async {
         StubURLProtocol.respond(status: 401, json: "{}")
         let auth = makeManager(store: InMemoryTokenStore())

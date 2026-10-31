@@ -172,7 +172,7 @@ struct AssessmentCategoryCard: View {
                 Spacer()
                 Text(String(format: "Avg %.2f", averageScore))
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.readableSecondary)
             }
 
             ForEach(group.factors) { factor in

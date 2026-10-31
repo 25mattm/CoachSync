@@ -30,6 +30,13 @@ final class VisualTourUITests: XCTestCase {
         runTour()
     }
 
+    /// The very largest text size (AX5, about 300%), where layouts are most likely to break.
+    func testVisualTourLargestTextSize() throws {
+        launch(extraArguments: ["-UIPreferredContentSizeCategoryName",
+                                "UICTContentSizeCategoryAccessibilityXXXL"])
+        runTour()
+    }
+
     // MARK: - Tour
 
     private func runTour() {

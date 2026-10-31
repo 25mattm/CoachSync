@@ -2,6 +2,7 @@ package com.coachsync;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.context.annotation.Bean;
 
 import java.time.Clock;
@@ -12,6 +13,7 @@ import java.time.ZoneId;
  * read-only analytics. See {@code coachsync-training-log-data-model.md}.
  */
 @SpringBootApplication
+@EnableScheduling
 public class CoachSyncBackendApplication {
 
     public static void main(String[] args) {

@@ -71,11 +71,13 @@ jobs:
       - name: Release config guard refuses placeholders
         run: |
           if ACTION=install PRODUCT_BUNDLE_IDENTIFIER=com.example.CoachSync DEVELOPMENT_TEAM= \
-             COACHSYNC_BACKEND_URL=http://localhost:8080 scripts/check-release-config.sh; then
+             COACHSYNC_BACKEND_URL=http://localhost:8080 COACHSYNC_PRIVACY_POLICY_URL= \
+             scripts/check-release-config.sh; then
             echo "check-release-config.sh accepted the placeholders"; exit 1
           fi
           ACTION=install PRODUCT_BUNDLE_IDENTIFIER=com.yourname.CoachSync DEVELOPMENT_TEAM=ABCDE12345 \
-            COACHSYNC_BACKEND_URL=https://coachsync.example.com scripts/check-release-config.sh
+            COACHSYNC_BACKEND_URL=https://coachsync.example.com \
+            COACHSYNC_PRIVACY_POLICY_URL=https://coachsync.example.com/privacy scripts/check-release-config.sh
       - name: Upload test results
         if: failure()
         uses: actions/upload-artifact@v4
