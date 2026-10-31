@@ -168,7 +168,7 @@ struct AthleteRow: View {
     @ScaledMetric(relativeTo: .subheadline) private var avatarSize: CGFloat = 44
 
     var body: some View {
-        HStack(spacing: 12) {
+        AdaptiveStack(spacing: 12) {
             Circle()
                 .fill(Color.ageCategory(athlete.ageCategory).opacity(0.15))
                 .frame(width: avatarSize, height: avatarSize)
@@ -179,6 +179,7 @@ struct AthleteRow: View {
                         .lineLimit(1)
                         .minimumScaleFactor(0.6)
                         .foregroundStyle(Color.ageCategory(athlete.ageCategory))
+                        .accessibilityHidden(true)
                 )
 
             VStack(alignment: .leading, spacing: 3) {
@@ -192,7 +193,7 @@ struct AthleteRow: View {
                     if let gender = athlete.gender {
                         Text(gender == .male ? "M" : "F")
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.readableSecondary)
                             .accessibilityLabel(gender == .male ? "Male" : "Female")
                     }
 
@@ -200,7 +201,7 @@ struct AthleteRow: View {
                     if !activeTeams.isEmpty {
                         Text("\(activeTeams.count) team\(activeTeams.count == 1 ? "" : "s")")
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.readableSecondary)
                     }
                 }
             }
@@ -225,7 +226,7 @@ struct CategoryHeader: View {
             Spacer()
             Text("\(count) athlete\(count == 1 ? "" : "s")")
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.readableSecondary)
         }
     }
 }
@@ -311,7 +312,7 @@ struct AddAthleteSheet: View {
                 } footer: {
                     if !emailIsValid {
                         Text("Enter a valid email address, or leave it blank.")
-                            .foregroundStyle(.red)
+                            .foregroundStyle(Color.readableRed)
                     }
                 }
             }

@@ -14,4 +14,8 @@ COACHSYNC_DEVELOPMENT_TEAM =
 // as https:/$()/host.
 COACHSYNC_BACKEND_URL = http:/$()/localhost:8080
 
+// Your published privacy policy, linked from the sign-in screen and Settings. The App Store
+// requires the link in the app, and an archive refuses an empty value.
+COACHSYNC_PRIVACY_POLICY_URL =
+
 #include? "Local.xcconfig"

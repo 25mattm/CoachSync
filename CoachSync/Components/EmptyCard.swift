@@ -10,10 +10,10 @@ struct EmptyCard: View {
         HStack(spacing: 14) {
             Image(systemName: systemImage)
                 .font(.title2)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.readableSecondary)
             Text(message)
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.readableSecondary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(16)

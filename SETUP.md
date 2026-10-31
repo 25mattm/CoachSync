@@ -63,7 +63,7 @@ cp Config/Local.xcconfig.example Config/Local.xcconfig
 ```
 
 Then set `COACHSYNC_BUNDLE_ID_PREFIX`, `COACHSYNC_DEVELOPMENT_TEAM` and an https
-`COACHSYNC_BACKEND_URL` in it. Every target and configuration picks them up.
+`COACHSYNC_BACKEND_URL` and `COACHSYNC_PRIVACY_POLICY_URL` in it. Every target and configuration picks them up.
 
 ## The backend
 
@@ -88,3 +88,14 @@ Spring Boot 4 contributor gotchas.
 | `CoachSyncTests/` | app unit tests |
 | `backend/` | Spring Boot backend (see its README) |
 | `docs/` | PRD, architecture notes, user guide |
+
+### Account deletion: revoking the Sign in with Apple grant
+
+Settings → Delete Account deletes the coach's account on the backend, as App Store Review Guideline
+5.1.1(v) requires. To also revoke the Apple grant, which Apple requires of apps using Sign in with
+Apple, give the backend a Sign in with Apple key from your Apple Developer account:
+
+    COACHSYNC_APPLE_TEAM_ID, COACHSYNC_APPLE_KEY_ID, COACHSYNC_APPLE_PRIVATE_KEY
+
+Keep these in your deployment's secrets, never in the repo. Without them the account is still
+deleted, but the backend logs a warning and the grant isn't revoked.

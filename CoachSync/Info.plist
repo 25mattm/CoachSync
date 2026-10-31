@@ -7,6 +7,8 @@
 	<!-- Release builds: set COACHSYNC_BACKEND_URL in Config/Local.xcconfig. Debug builds use localhost. -->
 	<key>CoachSyncBackendURL</key>
 	<string>$(COACHSYNC_BACKEND_URL)</string>
+	<key>CoachSyncPrivacyPolicyURL</key>
+	<string>$(COACHSYNC_PRIVACY_POLICY_URL)</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<!-- Allows plain-HTTP to localhost / LAN hosts for local development only. -->

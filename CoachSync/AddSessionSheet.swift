@@ -309,7 +309,7 @@ private struct DraftSessionForm: View {
             if !isValid {
                 Text("End time must be after start time")
                     .font(.footnote)
-                    .foregroundStyle(.red)
+                    .foregroundStyle(Color.readableRed)
             }
 
             TextField("Name (auto-fills if blank)", text: $session.sessionName)
@@ -327,7 +327,7 @@ private struct DraftSessionForm: View {
             if sortedBlocks.isEmpty {
                 Text("No blocks yet — tap Add Block to plan the workout")
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.readableSecondary)
             } else {
                 ForEach(sortedBlocks) { block in
                     Button { blockToEdit = block } label: {
@@ -436,7 +436,7 @@ struct AddSessionBlockSummaryRow: View {
             if let summary = summaryLine {
                 Text(summary)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.readableSecondary)
             }
         }
         .padding(.vertical, 2)

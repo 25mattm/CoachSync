@@ -102,7 +102,7 @@ struct EditAthleteSheet: View {
                 } footer: {
                     if !emailIsValid {
                         Text("Enter a valid email address, or leave it blank.")
-                            .foregroundStyle(.red)
+                            .foregroundStyle(Color.readableRed)
                     }
                 }
 
@@ -110,7 +110,7 @@ struct EditAthleteSheet: View {
                     Toggle("Athlete is active", isOn: $isActive)
                     Text("Inactive athletes are hidden from all rosters, but all historical data is preserved.")
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.readableSecondary)
                 }
             }
             .navigationTitle("Edit Athlete")

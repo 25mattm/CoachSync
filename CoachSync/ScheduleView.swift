@@ -70,33 +70,35 @@ struct ScheduleView: View {
         NavigationStack {
             VStack(spacing: 0) {
                 if activeSessions.isEmpty {
-                    VStack(spacing: 14) {
-                        Spacer()
-                        Image(systemName: "calendar")
-                            .font(.largeTitle)
-                            .foregroundStyle(.secondary)
-                        Text("No practices scheduled")
-                            .font(.headline)
-                        Text("Archived practices are hidden from the calendar.")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                            .multilineTextAlignment(.center)
-                        Button {
-                            showingAddSession = true
-                        } label: {
-                            Label("Add Practice", systemImage: "plus")
+                    ScrollsWhenTooTall {
+                        VStack(spacing: 14) {
+                            Spacer()
+                            Image(systemName: "calendar")
+                                .font(.largeTitle)
+                                .foregroundStyle(Color.readableSecondary)
+                            Text("No practices scheduled")
+                                .font(.headline)
+                            Text("Archived practices are hidden from the calendar.")
                                 .font(.subheadline)
-                                .fontWeight(.medium)
-                                .padding(.horizontal, 20)
-                                .padding(.vertical, 12)
-                                .background(Color.accentColor.opacity(0.12))
-                                .foregroundStyle(Color.accentColor)
-                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                                .foregroundStyle(Color.readableSecondary)
+                                .multilineTextAlignment(.center)
+                            Button {
+                                showingAddSession = true
+                            } label: {
+                                Label("Add Practice", systemImage: "plus")
+                                    .font(.subheadline)
+                                    .fontWeight(.medium)
+                                    .padding(.horizontal, 20)
+                                    .padding(.vertical, 12)
+                                    .background(Color.accentColor.opacity(0.12))
+                                    .foregroundStyle(Color.accentColor)
+                                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                            }
+                            Spacer()
                         }
-                        Spacer()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .padding(.horizontal, 24)
                     }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .padding(.horizontal, 24)
                 } else {
                     CalendarGridView(
                         selectedDate: $selectedDate,
@@ -377,7 +379,7 @@ struct CalendarGridView: View {
                     Text(symbol)
                         .font(.caption2)
                         .fontWeight(.semibold)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.readableSecondary)
                         .frame(maxWidth: .infinity)
                 }
             }
@@ -386,16 +388,21 @@ struct CalendarGridView: View {
             LazyVGrid(columns: columns, spacing: 4) {
                 ForEach(Array(monthDays.enumerated()), id: \.offset) { _, date in
                     if let date = date {
-                        DayCell(
-                            date: date,
-                            isSelected: calendar.isDate(date, inSameDayAs: selectedDate),
-                            isToday: calendar.isDateInToday(date),
-                            hasSession: hasSession(on: date),
-                            hasRegatta: hasRegatta(on: date)
-                        )
-                        .onTapGesture {
+                        let isSelected = calendar.isDate(date, inSameDayAs: selectedDate)
+                        Button {
                             selectedDate = date
+                        } label: {
+                            DayCell(
+                                date: date,
+                                isSelected: isSelected,
+                                isToday: calendar.isDateInToday(date),
+                                hasSession: hasSession(on: date),
+                                hasRegatta: hasRegatta(on: date)
+                            )
+                            .contentShape(Rectangle())
                         }
+                        .buttonStyle(.plain)
+                        .accessibilityAddTraits(isSelected ? .isSelected : [])
                     } else {
                         Color.clear.frame(height: 36)
                     }
@@ -463,9 +470,11 @@ struct DayCell: View {
                         .frame(width: 5, height: 5)
                 }
                 if hasRegatta {
-                    Circle()
-                        .fill(Color.orange)
+                    // A diamond, so a regatta differs from a practice by more than color.
+                    Rectangle()
+                        .fill(Color.readableOrange)
                         .frame(width: 5, height: 5)
+                        .rotationEffect(.degrees(45))
                 }
             }
             .frame(height: 5)
@@ -507,7 +516,7 @@ struct ScheduleSessionCard: View {
                     if let team = session.team {
                         Text(team.teamName)
                             .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.readableSecondary)
                     }
                 }
                 Spacer()
@@ -521,14 +530,14 @@ struct ScheduleSessionCard: View {
                         systemImage: "clock"
                     )
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.readableSecondary)
                 } else if let start = session.startTime {
                     Label(
                         start.formatted(.dateTime.hour().minute()),
                         systemImage: "clock"
                     )
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.readableSecondary)
                 }
 
                 Label(
@@ -536,13 +545,13 @@ struct ScheduleSessionCard: View {
                     systemImage: "person.2"
                 )
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.readableSecondary)
             }
 
             if let note = session.teamNote, !note.isEmpty {
                 Text(note)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.readableSecondary)
                     .lineLimit(2)
             }
         }

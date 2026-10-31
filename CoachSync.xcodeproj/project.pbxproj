@@ -26,6 +26,7 @@
 		C0DEC0DE0000000000000071 /* WeatherLogicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DEC0DE0000000000000070 /* WeatherLogicTests.swift */; };
 		EA9AFB5D501D99021BE37ED8 /* AthleteCRUDUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 706CC47037B5657FBD146DAD /* AthleteCRUDUITests.swift */; };
 		FC14CD2B9B43619299A34AB6 /* SessionLoggingUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FE37D632C4EA833E6184165 /* SessionLoggingUITests.swift */; };
+		AA11A0000000000000000002 /* AccessibilityAuditUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11A0000000000000000001 /* AccessibilityAuditUITests.swift */; };
 		C0DEC0DE00000000000000A1 /* VisualTourUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DEC0DE00000000000000A0 /* VisualTourUITests.swift */; };
 		C0DEC0DE00000000000000B1 /* StringHelpersTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DEC0DE00000000000000B0 /* StringHelpersTests.swift */; };
 /* End PBXBuildFile section */
@@ -71,6 +72,7 @@
 		C0DEC0DE0000000000000060 /* NeedsAttentionSortTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NeedsAttentionSortTests.swift; sourceTree = "<group>"; };
 		C0DEC0DE0000000000000070 /* WeatherLogicTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherLogicTests.swift; sourceTree = "<group>"; };
 		C6C97A233A9DDE6EC90042E2 /* LoadRulesTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LoadRulesTests.swift; sourceTree = "<group>"; };
+		AA11A0000000000000000001 /* AccessibilityAuditUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessibilityAuditUITests.swift; sourceTree = "<group>"; };
 		C0DEC0DE00000000000000A0 /* VisualTourUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VisualTourUITests.swift; sourceTree = "<group>"; };
 		C0DEC0DE00000000000000B0 /* StringHelpersTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringHelpersTests.swift; sourceTree = "<group>"; };
 		C0DEC0DE00000000000000C0 /* Shared.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Shared.xcconfig; sourceTree = "<group>"; };
@@ -207,6 +209,7 @@
 				706CC47037B5657FBD146DAD /* AthleteCRUDUITests.swift */,
 				2E185CA6FB914D3A288B712D /* SessionSheetUITests.swift */,
 				3FE37D632C4EA833E6184165 /* SessionLoggingUITests.swift */,
+				AA11A0000000000000000001 /* AccessibilityAuditUITests.swift */,
 				C0DEC0DE00000000000000A0 /* VisualTourUITests.swift */,
 			);
 			name = CoachSyncUITests;
@@ -449,6 +452,7 @@
 				EA9AFB5D501D99021BE37ED8 /* AthleteCRUDUITests.swift in Sources */,
 				76D1EA07BA684F1369FC43C4 /* SessionSheetUITests.swift in Sources */,
 				FC14CD2B9B43619299A34AB6 /* SessionLoggingUITests.swift in Sources */,
+				AA11A0000000000000000002 /* AccessibilityAuditUITests.swift in Sources */,
 				C0DEC0DE00000000000000A1 /* VisualTourUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -54,7 +54,7 @@ struct WeatherCardView: View {
                 .controlSize(.small)
             Text("Fetching weather...")
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.readableSecondary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -76,7 +76,7 @@ struct WeatherCardView: View {
             if stale {
                 Text("Updated " + conditions.fetchedAt.formatted(.relative(presentation: .named)))
                     .font(.caption)
-                    .foregroundStyle(.orange)
+                    .foregroundStyle(Color.readableOrange)
             }
 
             if isExpanded {
@@ -93,7 +93,7 @@ struct WeatherCardView: View {
     private var weatherAttributionLink: some View {
         Link("Powered by Apple Weather", destination: URL(string: "https://weatherkit.apple.com/legal-attribution.html")!)
             .font(.caption2)
-            .foregroundStyle(.secondary)
+            .foregroundStyle(Color.readableSecondary)
     }
 
     private func loadedCompactRow(_ conditions: CurrentConditions) -> some View {
@@ -112,21 +112,21 @@ struct WeatherCardView: View {
                         systemImage: "wind"
                     )
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.readableSecondary)
                     Text("UV \(conditions.uvIndex)")
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.readableSecondary)
                 }
                 Text(conditions.placeName ?? "Current Location")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.readableSecondary)
             }
 
             Spacer()
 
             Image(systemName: "chevron.right")
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.readableSecondary)
                 .rotationEffect(.degrees(isExpanded ? 90 : 0))
         }
         .contentShape(Rectangle())
@@ -137,22 +137,22 @@ struct WeatherCardView: View {
             Grid(alignment: .leading, horizontalSpacing: 16, verticalSpacing: 6) {
                 GridRow {
                     Text("Feels like")
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.readableSecondary)
                     Text("\(Int(conditions.feelsLikeC.rounded()))°C")
                 }
                 GridRow {
                     Text("Humidity")
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.readableSecondary)
                     Text("\(Int(conditions.humidity * 100))%")
                 }
                 GridRow {
                     Text("Visibility")
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.readableSecondary)
                     Text("\(Int(conditions.visibilityKm.rounded())) km")
                 }
                 GridRow {
                     Text("Dew point")
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.readableSecondary)
                     Text("\(Int(conditions.dewPointC.rounded()))°C")
                 }
             }
@@ -166,7 +166,7 @@ struct WeatherCardView: View {
             if !stale {
                 Text("Updated " + conditions.fetchedAt.formatted(date: .omitted, time: .shortened))
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.readableSecondary)
             }
         }
     }
@@ -182,10 +182,10 @@ struct WeatherCardView: View {
         return layout {
             Image(systemName: "location.slash")
                 .font(.title2)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.readableSecondary)
             Text("Location access needed for weather")
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.readableSecondary)
             if !dynamicTypeSize.isAccessibilitySize {
                 Spacer()
             }
@@ -195,6 +195,7 @@ struct WeatherCardView: View {
                 }
             }
             .font(.caption)
+            .comfortableTapTarget()
         }
         .frame(maxWidth: .infinity, alignment: .leading)   // stacked, the card would otherwise hug its text
     }
@@ -208,10 +209,10 @@ struct WeatherCardView: View {
             HStack(spacing: 10) {
                 Image(systemName: "cloud.slash")
                     .font(.title2)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.readableSecondary)
                 Text("Weather unavailable")
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.readableSecondary)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .contentShape(Rectangle())

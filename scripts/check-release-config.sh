@@ -20,4 +20,10 @@ case "$COACHSYNC_BACKEND_URL" in
     echo "error: COACHSYNC_BACKEND_URL must be an https URL for a release (now: '$COACHSYNC_BACKEND_URL'). Set it in Config/Local.xcconfig."
     status=1 ;;
 esac
+case "$COACHSYNC_PRIVACY_POLICY_URL" in
+  https://*) ;;
+  *)
+    echo "error: COACHSYNC_PRIVACY_POLICY_URL must be an https URL for a release (now: '$COACHSYNC_PRIVACY_POLICY_URL'). Set it in Config/Local.xcconfig."
+    status=1 ;;
+esac
 exit $status
