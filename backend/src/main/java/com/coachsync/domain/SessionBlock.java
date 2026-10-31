@@ -32,6 +32,17 @@ import java.util.List;
 @Table(name = "session_block")
 public class SessionBlock extends TenantScoped {
 
+    /**
+     * Reconcile builds one slot per present athlete per rep, in memory, so this bounds its cost. The
+     * app's own limits stay inside it: 50 reps from the steppers in {@code AddBlockSheet}, and for a
+     * pyramid at most {@link #MAX_PATTERN_LENGTH} × {@link #MAX_SET_COUNT}.
+     */
+    public static final int MAX_REPETITION_COUNT = 500;
+    public static final int MAX_SET_COUNT = 10;
+    public static final int MAX_PATTERN_LENGTH = 50;
+    /** The app's duration editor tops out at 59:59. */
+    public static final int MAX_REP_DURATION_SEC = 3600;
+
     @Column(nullable = false)
     private String blockName;
 
