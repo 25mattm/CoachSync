@@ -37,7 +37,7 @@ import java.util.List;
  * resource-server auto-config back off (no {@code issuer-uri}/{@code jwk-set-uri} required).
  */
 @Configuration
-@EnableConfigurationProperties(AuthProperties.class)
+@EnableConfigurationProperties({AuthProperties.class, AppleRevocationProperties.class})
 public class SecurityConfig {
 
     /**

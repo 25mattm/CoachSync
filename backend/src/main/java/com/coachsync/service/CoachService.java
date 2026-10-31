@@ -28,6 +28,9 @@ import java.util.UUID;
 @Service
 public class CoachService {
 
+    /** Shown wherever a deleted coach is still attributed on club history. */
+    static final String DELETED_COACH_NAME = "Former coach";
+
     private final CoachRepository coaches;
     private final CoachSessionRepository sessions;
     private final AthleteNoteRepository notes;
@@ -135,6 +138,33 @@ public class CoachService {
                     + "entries and cannot be deleted; reassign or remove them first.");
         }
         coaches.delete(coach);
+    }
+
+    /**
+     * Deletes the caller's own account. The sign-in identity and personal details always go. A coach
+     * attributed on the club's sessions, notes or journal entries keeps an anonymous row so that club
+     * history survives; one with nothing attributed is removed outright. Clearing
+     * {@code appleUserId} revokes every outstanding token ({@code ActiveCoachFilter}), and signing in
+     * again later provisions a brand-new coach with no club.
+     */
+    @Transactional
+    public void deleteOwnAccount() {
+        UUID id = tenant.currentCoachId()
+                .orElseThrow(() -> new ForbiddenException("Only a signed-in coach can delete their account."));
+        Coach coach = coaches.findById(id)
+                .orElseThrow(() -> new NotFoundException("No coach with id " + id));
+        if (sessions.existsByCoachId(id) || notes.existsByCoachId(id) || journal.existsByCoachId(id)) {
+            coach.setName(DELETED_COACH_NAME);
+            coach.setAppleUserId(null);
+            coach.setEmail(null);
+            coach.setRole(null);
+            coach.setNccpLevel(null);
+            coach.setColorHex(null);
+            coach.setRequestedClub(null);
+            coaches.save(coach);
+        } else {
+            coaches.delete(coach);
+        }
     }
 
     /**
