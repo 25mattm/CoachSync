@@ -11,10 +11,11 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
- * Gates the platform-operator actions: creating a club and approving a coach into one. There is no
+ * Gates the platform-operator actions: creating a club, and approving a coach into one or removing
+ * them from it. There is no
  * admin role on {@link Coach} — {@code coachsync.auth.allowed-emails} (the former sign-in allowlist,
  * repurposed per the multi-club tenancy plan's settled slice 4 design) is now the operator gate
- * instead: only a signed-in coach whose email is on that list may call the two operator-only
+ * instead: only a signed-in coach whose email is on that list may call the operator-only
  * endpoints. Ordinary data access no longer depends on this list at all.
  */
 @Component

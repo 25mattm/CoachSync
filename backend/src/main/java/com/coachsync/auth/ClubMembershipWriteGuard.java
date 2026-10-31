@@ -23,8 +23,8 @@ import java.util.Set;
  * that <em>same</em> shared sentinel — reachable and mutable by any other pending stranger.
  *
  * <p>Fail-closed by construction: a club-less caller's mutating request (POST/PUT/PATCH/DELETE) is
- * rejected (403) unless it matches one of the three routes a club-less caller legitimately needs —
- * all part of getting <em>into</em> a club, never touching a {@code @TenantId}-scoped table. An
+ * rejected (403) unless it matches one of the routes a club-less caller legitimately needs — getting
+ * <em>into</em> a club, or the operator managing membership, never touching a {@code @TenantId}-scoped table. An
  * approved coach (a token carrying a {@code club} claim) is never affected; the tenant filter already
  * scopes their writes correctly. Deliberately a single deny-by-default boundary rather than a
  * per-service guard repeated on all 15 tenant-scoped write paths, so a future 16th entity is covered
@@ -46,8 +46,10 @@ public class ClubMembershipWriteGuard extends OncePerRequestFilter {
             HttpMethod.POST.name(), HttpMethod.PUT.name(), HttpMethod.PATCH.name(), HttpMethod.DELETE.name());
 
     /**
-     * The only writes a club-less caller may make — all bootstrap routes for getting into a club, not
-     * data. Matched by method <em>and</em> exact path pattern, not by prefix. {@link AntPathMatcher}'s
+     * The only writes a club-less caller may make — bootstrap routes for getting into a club and the
+     * operator's membership routes, not data. The operator belongs to no club of their own, so those
+     * routes must pass here; {@link OperatorGuard} in the service refuses everyone else. Matched by
+     * method <em>and</em> exact path pattern, not by prefix. {@link AntPathMatcher}'s
      * {@code *} matches exactly one path segment and never crosses {@code /}, so
      * {@code /api/coaches/*}{@code /approve} matches only {@code /api/coaches/{id}/approve} — never
      * {@code /api/coaches} (roster create) or {@code /api/coaches/{id}} (roster update/delete).
@@ -55,7 +57,8 @@ public class ClubMembershipWriteGuard extends OncePerRequestFilter {
     private static final List<AllowedWrite> CLUB_LESS_WRITE_ALLOWLIST = List.of(
             new AllowedWrite("POST", "/api/clubs"),
             new AllowedWrite("POST", "/api/clubs/join"),
-            new AllowedWrite("POST", "/api/coaches/*/approve"));
+            new AllowedWrite("POST", "/api/coaches/*/approve"),
+            new AllowedWrite("POST", "/api/coaches/*/remove"));
 
     private record AllowedWrite(String method, String pathPattern) {}
 
