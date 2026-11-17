@@ -46,6 +46,10 @@ jobs:
       - uses: actions/checkout@v4
       - name: Xcode version
         run: xcodebuild -version
+      # The runner lists no simulators to xcodebuild until one has been started, so the
+      # destination below can't be found without this. The nightly workflow does the same.
+      - name: Boot simulator
+        run: xcrun simctl boot "iPhone 17" || true
       - name: Unit tests
         run: |
           xcodebuild test \
