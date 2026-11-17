@@ -121,6 +121,32 @@ final class SyncMappingTests: XCTestCase {
     }
 
     @MainActor
+    /// A coach deleting their account changes the coach row, not the sessions they logged, so the
+    /// session's own merge check would skip it and leave their real name showing.
+    func testPullingAnAnonymizedCoachRenamesTheirUnchangedSession() throws {
+        let ctx = try makeContext()
+        let logged = Date(timeIntervalSince1970: 1_000)
+        SyncMapping.upsertCoach(CoachDTO(id: coachID, name: "Alice", role: "Head", nccpLevel: nil,
+                                         colorHex: nil, createdAt: logged, updatedAt: logged), in: ctx)
+        let session = SessionDTO(
+            id: sessionID, sessionName: "Tuesday", scheduledDate: "2026-06-10",
+            startTime: nil, endTime: nil, status: "COMPLETED", weatherNote: nil, teamNote: nil,
+            sessionNote: nil, mfCue: nil, archived: false, coachId: coachID, teamId: nil,
+            createdAt: logged, updatedAt: logged)
+        SyncMapping.upsertSession(session, in: ctx)
+        XCTAssertEqual(try ctx.fetch(FetchDescriptor<CoachSession>()).first?.createdByCoachName, "Alice")
+
+        let deleted = logged.addingTimeInterval(60)
+        SyncMapping.upsertCoach(CoachDTO(id: coachID, name: "Former coach", role: nil, nccpLevel: nil,
+                                         colorHex: nil, createdAt: logged, updatedAt: deleted), in: ctx)
+        SyncMapping.upsertSession(session, in: ctx)
+
+        let coach = try XCTUnwrap(try ctx.fetch(FetchDescriptor<Coach>()).first)
+        XCTAssertEqual(coach.name, "Former coach")
+        XCTAssertNil(coach.role)
+        XCTAssertEqual(try ctx.fetch(FetchDescriptor<CoachSession>()).first?.createdByCoachName, "Former coach")
+    }
+
     func testUpsertSessionPreservesCoachNameWhenCoachUnresolved() throws {
         let ctx = try makeContext()
         let t1 = Date(timeIntervalSince1970: 1000), t2 = Date(timeIntervalSince1970: 2000)

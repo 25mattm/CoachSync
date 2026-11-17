@@ -154,7 +154,7 @@ struct AddBlockSheet: View {
                             .font(.subheadline)
                         Text(String(format: "%.2f km", totalKm))
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.readableSecondary)
                     }
                     Spacer()
                     Toggle("Override", isOn: $useKmOverride)
@@ -581,7 +581,7 @@ private struct TimeChip: View {
                     .font(.caption)
             }
             .buttonStyle(.plain)
-            .foregroundStyle(.secondary)
+            .foregroundStyle(Color.readableSecondary)
             .accessibilityLabel("Remove chip")
         }
         .padding(.horizontal, 10)

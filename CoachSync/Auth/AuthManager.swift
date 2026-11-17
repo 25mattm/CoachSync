@@ -63,6 +63,39 @@ final class AuthManager {
         state = .signedOut
     }
 
+    /// Deletes this coach's account on the server. `authorizationCode` comes from a fresh Apple
+    /// authorization, which also confirms the person at the device means it. On success this device
+    /// is signed out; the caller clears its local data. Returns an error to show, or nil on success.
+    func deleteAccount(authorizationCode: String, clientId: String) async -> String? {
+        guard let token = currentSession?.token else {
+            return "Sign in required."
+        }
+        do {
+            let request = try client.jsonRequest(
+                path: "/api/account/delete", method: "POST", token: token,
+                body: DeleteAccountRequestDTO(authorizationCode: authorizationCode, clientId: clientId))
+            switch try await client.sendForStatus(request) {
+            case 200...299:
+                break
+            case 401:
+                // The session is dead, which is also what an earlier delete whose reply never
+                // arrived looks like. This device can't tell which, so it's honest about both.
+                signOut()
+                return "You've been signed out, so this device can't confirm your account was deleted. If it wasn't, sign in and try again."
+            case 403:
+                return "Apple couldn't confirm it's you, so your account wasn't deleted. Make sure you're using the Apple ID you signed in with."
+            default:
+                return "Your account wasn't deleted. Please try again."
+            }
+        } catch BackendError.transport {
+            return "Couldn't reach the club server, so your account wasn't deleted. Check your connection and try again."
+        } catch {
+            return "Your account wasn't deleted. Please try again."
+        }
+        signOut()
+        return nil
+    }
+
     /// Outcome of ``joinClub(code:)`` — mirrors the backend's `POST /api/clubs/join` responses.
     enum JoinClubResult {
         /// Request recorded; still pending an operator's approval.

@@ -7,11 +7,24 @@
 	<!-- Release builds: set COACHSYNC_BACKEND_URL in Config/Local.xcconfig. Debug builds use localhost. -->
 	<key>CoachSyncBackendURL</key>
 	<string>$(COACHSYNC_BACKEND_URL)</string>
+	<key>CoachSyncPrivacyPolicyURL</key>
+	<string>$(COACHSYNC_PRIVACY_POLICY_URL)</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<!-- Allows plain-HTTP to localhost / LAN hosts for local development only. -->
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
+		<key>NSExceptionDomains</key>
+		<dict>
+			<!-- Filled in by the Info.plist preprocessor; see Config/Shared.xcconfig. -->
+			<key>COACHSYNC_PRIVATE_NETWORK_DOMAIN</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+			</dict>
+		</dict>
 	</dict>
 	<!-- iOS 14+ gates local-network access behind a user prompt. Without this key the prompt
 	     never appears and the connection fails silently — no error, no dialog, just a sync

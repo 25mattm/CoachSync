@@ -29,7 +29,7 @@ jobs:
             -destination "$DESTINATION" \
             -only-testing:CoachSyncUITests \
             -resultBundlePath build/ui-light.xcresult
-      - name: Visual tour (dark)
+      - name: Visual tour and accessibility audit (dark)
         if: always()
         run: |
           xcrun simctl ui booted appearance dark
@@ -37,6 +37,7 @@ jobs:
             -project CoachSync.xcodeproj -scheme CoachSync \
             -destination "$DESTINATION" \
             -only-testing:CoachSyncUITests/VisualTourUITests/testVisualTour \
+            -only-testing:CoachSyncUITests/AccessibilityAuditUITests \
             -resultBundlePath build/ui-dark.xcresult
       - name: Upload results and screenshots
         if: always()

@@ -938,13 +938,13 @@ enum TrainingZone: String, Codable, CaseIterable {
 
     var color: Color {
         switch self {
-        case .ga1:      return .blue
-        case .ga2:      return .cyan
-        case .e1:       return .orange
-        case .e2:       return .red
-        case .anMix:    return .purple
-        case .alactic:  return .pink
-        case .recovery: return .green
+        case .ga1:      return .readableBlue
+        case .ga2:      return .readableCyan
+        case .e1:       return .readableOrange
+        case .e2:       return .readableRed
+        case .anMix:    return .readablePurple
+        case .alactic:  return .readablePink
+        case .recovery: return .readableGreen
         }
     }
 }
@@ -965,8 +965,8 @@ extension SessionStatus {
     var color: Color {
         switch self {
         case .open:      return .clear
-        case .completed: return .gray
-        case .cancelled: return .red
+        case .completed: return .readableGray
+        case .cancelled: return .readableRed
         }
     }
 }

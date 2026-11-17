@@ -14,4 +14,15 @@ COACHSYNC_DEVELOPMENT_TEAM =
 // as https:/$()/host.
 COACHSYNC_BACKEND_URL = http:/$()/localhost:8080
 
+// Your published privacy policy, linked from the sign-in screen and Settings. The App Store
+// requires the link in the app, and an archive refuses an empty value.
+COACHSYNC_PRIVACY_POLICY_URL =
+
+// A private-network domain whose traffic is already encrypted, so plain HTTP to it is allowed. The
+// default only covers this machine. Set it in Config/Local.xcconfig, along with an http
+// COACHSYNC_BACKEND_URL on that domain, if your backend is reached that way.
+COACHSYNC_PRIVATE_NETWORK_DOMAIN = localhost
+INFOPLIST_PREPROCESS = YES
+INFOPLIST_PREPROCESSOR_DEFINITIONS = COACHSYNC_PRIVATE_NETWORK_DOMAIN=$(COACHSYNC_PRIVATE_NETWORK_DOMAIN)
+
 #include? "Local.xcconfig"

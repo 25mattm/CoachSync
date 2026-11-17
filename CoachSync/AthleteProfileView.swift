@@ -39,9 +39,24 @@ private enum NotesFilter: String, CaseIterable {
 struct AthleteProfileView: View {
     @Bindable var athlete: Athlete
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var showingEditAthlete = false
     @State private var selectedTab: ProfileTab = .overview
     @State private var notesFilter: NotesFilter = .all
+
+    /// Segments can't grow with Dynamic Type, so a menu takes over at accessibility sizes.
+    @ViewBuilder private var sectionPicker: some View {
+        let picker = Picker("Section", selection: $selectedTab) {
+            ForEach(ProfileTab.allCases, id: \.self) { tab in
+                Text(tab.rawValue).tag(tab)
+            }
+        }
+        if dynamicTypeSize.isAccessibilitySize {
+            picker.pickerStyle(.menu)
+        } else {
+            picker.pickerStyle(.segmented)
+        }
+    }
 
     var body: some View {
         ScrollViewReader { proxy in
@@ -49,12 +64,7 @@ struct AthleteProfileView: View {
                 VStack(alignment: .leading, spacing: 20) {
                     ProfileHeaderView(athlete: athlete)
 
-                    Picker("Section", selection: $selectedTab) {
-                        ForEach(ProfileTab.allCases, id: \.self) { tab in
-                            Text(tab.rawValue).tag(tab)
-                        }
-                    }
-                    .pickerStyle(.segmented)
+                    sectionPicker
 
                     if selectedTab == .development {
                         devAnchorStrip(proxy: proxy)
@@ -94,7 +104,7 @@ struct AthleteProfileView: View {
         FlowLayout(spacing: 8) {
             ForEach(DevAnchor.allCases, id: \.self) { anchor in
                 Button {
-                    withAnimation(.easeInOut(duration: 0.25)) {
+                    withAnimation(Motion.animation(.easeInOut(duration: 0.25))) {
                         proxy.scrollTo(anchor, anchor: .top)
                     }
                 } label: {
@@ -184,6 +194,7 @@ struct ProfileHeaderView: View {
                         .font(.title2)
                         .fontWeight(.bold)
                         .foregroundStyle(Color.ageCategory(athlete.ageCategory))
+                        .accessibilityHidden(true)
                 )
 
             VStack(alignment: .leading, spacing: 6) {
@@ -196,7 +207,7 @@ struct ProfileHeaderView: View {
 
                     Text(formattedDOB)
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.readableSecondary)
                 }
 
                 if !athlete.isActive {
@@ -205,7 +216,7 @@ struct ProfileHeaderView: View {
                         .foregroundStyle(.white)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 3)
-                        .background(Color.red.opacity(0.8))
+                        .background(Color.filledRed)
                         .clipShape(Capsule())
                 }
             }
@@ -236,7 +247,7 @@ struct TeamMembershipsSection: View {
             if activeTeams.isEmpty {
                 Text("Not currently on any teams")
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.readableSecondary)
             } else {
                 FlowLayout(spacing: 8) {
                     ForEach(activeTeams) { membership in
@@ -273,18 +284,18 @@ struct SessionHistorySection: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            HStack {
+            AdaptiveStack {
                 SectionHeader(title: "Practice History")
-                Spacer()
+                AdaptiveSpacer()
                 Text("\(attendanceRecords.count) practice\(attendanceRecords.count == 1 ? "" : "s")")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.readableSecondary)
             }
 
             if attendanceRecords.isEmpty {
                 Text("No practices recorded yet")
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.readableSecondary)
             } else {
                 VStack(spacing: 8) {
                     ForEach(attendanceRecords.prefix(5)) { record in
@@ -293,7 +304,7 @@ struct SessionHistorySection: View {
                     if attendanceRecords.count > 5 {
                         Text("+ \(attendanceRecords.count - 5) more practice\(attendanceRecords.count - 5 == 1 ? "" : "s")")
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.readableSecondary)
                             .padding(.top, 4)
                     }
                 }
@@ -307,7 +318,7 @@ struct AttendanceRow: View {
     let record: AttendanceRecord
 
     var body: some View {
-        HStack {
+        AdaptiveStack {
             Circle()
                 .fill(statusColor.opacity(0.15))
                 .frame(width: 10, height: 10)
@@ -319,11 +330,11 @@ struct AttendanceRow: View {
                 if let date = record.session?.scheduledDate {
                     Text(date.formatted(.dateTime.month(.abbreviated).day().year()))
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.readableSecondary)
                 }
             }
 
-            Spacer()
+            AdaptiveSpacer()
 
             Text(record.status.rawValue)
                 .font(.caption)
@@ -335,9 +346,9 @@ struct AttendanceRow: View {
 
     var statusColor: Color {
         switch record.status {
-        case .present: return .green
-        case .absent:  return .red
-        case .excused: return .orange
+        case .present: return .readableGreen
+        case .absent:  return .readableRed
+        case .excused: return .readableOrange
         }
     }
 }
@@ -373,7 +384,7 @@ struct PerformanceLogSection: View {
             if groupedRecords.isEmpty {
                 Text("No performance data recorded yet")
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.readableSecondary)
             } else {
                 ForEach(groupedRecords, id: \.blockName) { group in
                     PerformanceBlockCard(blockName: group.blockName,
@@ -447,11 +458,11 @@ struct PerformanceBlockCard: View {
                     HStack(spacing: 4) {
                         Image(systemName: "star.fill")
                             .font(.caption2)
-                            .foregroundStyle(.yellow)
+                            .foregroundStyle(Color.readableYellow)
                         Text("PB \(pb)")
                             .font(.caption)
                             .fontWeight(.medium)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.readableSecondary)
                     }
                 }
             }
@@ -466,7 +477,7 @@ struct PerformanceBlockCard: View {
                         HStack {
                             Text(entry.date.formatted(.dateTime.month(.abbreviated).day()))
                                 .font(.caption)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(Color.readableSecondary)
                             Spacer()
                             Text(entry.bestTime)
                                 .font(.caption)
@@ -477,10 +488,10 @@ struct PerformanceBlockCard: View {
                             HStack(alignment: .top, spacing: 4) {
                                 Image(systemName: "bubble.left")
                                     .font(.caption2)
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(Color.readableSecondary)
                                 Text(note)
                                     .font(.caption2)
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(Color.readableSecondary)
                                     .lineLimit(2)
                             }
                         }
@@ -543,7 +554,7 @@ struct TrendChartView: View {
         if chartData.count < 2 {
             Text("Need 2+ practices to show trend")
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.readableSecondary)
                 .frame(maxWidth: .infinity, alignment: .center)
                 .padding(.vertical, 8)
         } else {
@@ -561,23 +572,27 @@ struct TrendChartView: View {
                             x: .value("Practice", index),
                             y: .value("Time (ms)", point.timeMs)
                         )
-                        .foregroundStyle(Color.blue)
+                        .foregroundStyle(Color.readableBlue)
+                        .accessibilityLabel("\(point.source == .practice ? "Practice" : "Regatta") result \(index + 1) of \(chartData.count)")
+                        .accessibilityValue(formatMillisecondsForDisplay(point.timeMs))
 
                         if point.source == .practice {
                             PointMark(
                                 x: .value("Practice", index),
                                 y: .value("Time (ms)", point.timeMs)
                             )
-                            .foregroundStyle(Color.blue)
+                            .foregroundStyle(Color.readableBlue)
                             .symbol(.circle)
+                            .accessibilityHidden(true)
                         } else {
                             PointMark(
                                 x: .value("Practice", index),
                                 y: .value("Time (ms)", point.timeMs)
                             )
-                            .foregroundStyle(Color.purple)
+                            .foregroundStyle(Color.readablePurple)
                             .symbol(.diamond)
                             .symbolSize(70)
+                            .accessibilityHidden(true)
                         }
                     }
 
@@ -585,11 +600,13 @@ struct TrendChartView: View {
                     if let pb = personalBestMs {
                         RuleMark(y: .value("PB", pb))
                             .lineStyle(StrokeStyle(lineWidth: 1.5, dash: [4]))
-                            .foregroundStyle(Color.yellow.opacity(0.8))
+                            .foregroundStyle(Color.readableYellow)
+                            .accessibilityLabel("Personal best")
+                            .accessibilityValue(formatMillisecondsForDisplay(pb))
                             .annotation(position: .trailing) {
                                 Text("PB")
                                     .font(.system(size: chartLabelSize))
-                                    .foregroundStyle(Color.yellow)
+                                    .foregroundStyle(Color.readableYellow)
                             }
                     }
                 }
@@ -674,7 +691,7 @@ struct FitnessTestsSummarySection: View {
                 if athlete.gender == nil {
                     Text("Set athlete gender to see LTAD benchmarks.")
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.readableSecondary)
                 }
             }
         }
@@ -711,7 +728,7 @@ struct FitnessTestSummaryRow: View {
                     .fontWeight(.medium)
                 Text(result.formattedTime)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.readableSecondary)
             }
 
             Spacer()
@@ -724,7 +741,7 @@ struct FitnessTestSummaryRow: View {
             } else {
                 Text("—")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.readableSecondary)
             }
         }
         .padding(12)
@@ -763,7 +780,7 @@ struct RegattaResultsSection: View {
             if recentResults.isEmpty {
                 Text("No regatta results logged yet")
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.readableSecondary)
             } else {
                 VStack(spacing: 8) {
                     ForEach(recentResults.prefix(3)) { result in
@@ -796,11 +813,11 @@ struct RegattaProfileRow: View {
                 HStack(spacing: 6) {
                     Text("\(String(result.eventDistance))m")
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.readableSecondary)
                     if let placementText {
                         Text("• \(placementText)")
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.readableSecondary)
                     }
                 }
             }
@@ -963,7 +980,7 @@ struct LoadSection: View {
                         .foregroundStyle(Color.accentColor)
                     Text("km this week")
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.readableSecondary)
                 }
                 VStack(spacing: 4) {
                     Text(String(format: "%.0f", seasonalKm))
@@ -971,7 +988,7 @@ struct LoadSection: View {
                         .foregroundStyle(progressColor)
                     Text("km this season")
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.readableSecondary)
                 }
                 Spacer()
             }
@@ -981,17 +998,17 @@ struct LoadSection: View {
                 HStack {
                     Text("LTAD Target (\(athlete.ageCategory))")
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.readableSecondary)
                     Spacer()
                     Text("\(String(Int(ltadTarget.min)))–\(String(Int(ltadTarget.max))) km/year")
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.readableSecondary)
                 }
 
                 if seasonalPaddleKm == 0 {
                     Text("No paddling km logged this season")
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.readableSecondary)
                 } else {
                     GeometryReader { geo in
                         ZStack(alignment: .leading) {
@@ -1026,7 +1043,7 @@ struct LoadSection: View {
                         Spacer()
                         Text(String(format: "%.0f%%", progress * 100))
                             .font(.caption2)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.readableSecondary)
                     }
                 }
             }
@@ -1035,7 +1052,7 @@ struct LoadSection: View {
                 VStack(alignment: .leading, spacing: 6) {
                     Text("Season km by zone")
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.readableSecondary)
 
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 8) {
@@ -1045,7 +1062,7 @@ struct LoadSection: View {
                                         .font(.caption2).fontWeight(.semibold)
                                         .foregroundStyle(item.zone.color)
                                     Text(item.zone.description)
-                                        .font(.caption2).foregroundStyle(.secondary)
+                                        .font(.caption2).foregroundStyle(Color.readableSecondary)
                                         .lineLimit(2)
                                     Text(String(format: "%.1f km", item.km))
                                         .font(.caption).foregroundStyle(.primary)
@@ -1063,7 +1080,7 @@ struct LoadSection: View {
 
             Text("Recovery zone km excluded from load totals. LTAD progress counts paddling km only — runs don't advance it.")
                 .font(.caption2)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.readableSecondary)
         }
     }
 
@@ -1118,14 +1135,14 @@ struct AthleteInsightSection: View {
                             HStack(spacing: 8) {
                                 Image(systemName: "arrow.down.right")
                                     .font(.caption)
-                                    .foregroundStyle(.green)
+                                    .foregroundStyle(Color.readableGreen)
                                 Text("\(blockName): improving")
                                     .font(.subheadline)
                                 Spacer()
                                 TrendBadge(direction: .improving)
                                 Image(systemName: "chevron.right")
                                     .font(.caption2)
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(Color.readableSecondary)
                             }
                         }
                         .buttonStyle(.plain)
@@ -1136,14 +1153,14 @@ struct AthleteInsightSection: View {
                             HStack(spacing: 8) {
                                 Image(systemName: "arrow.up.right")
                                     .font(.caption)
-                                    .foregroundStyle(.red)
+                                    .foregroundStyle(Color.readableRed)
                                 Text("\(blockName): declining")
                                     .font(.subheadline)
                                 Spacer()
                                 TrendBadge(direction: .declining)
                                 Image(systemName: "chevron.right")
                                     .font(.caption2)
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(Color.readableSecondary)
                             }
                         }
                         .buttonStyle(.plain)
@@ -1154,13 +1171,13 @@ struct AthleteInsightSection: View {
                             HStack(spacing: 8) {
                                 Image(systemName: "waveform.path.ecg")
                                     .font(.caption)
-                                    .foregroundStyle(.orange)
+                                    .foregroundStyle(Color.readableOrange)
                                 Text("\(pacing.name): erratic pacing (\(pacing.cvPercent)% CV)")
                                     .font(.subheadline)
                                 Spacer()
                                 Image(systemName: "chevron.right")
                                     .font(.caption2)
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(Color.readableSecondary)
                             }
                         }
                         .buttonStyle(.plain)
@@ -1170,13 +1187,13 @@ struct AthleteInsightSection: View {
                         HStack(spacing: 8) {
                             Image(systemName: "chart.line.downtrend.xyaxis")
                                 .font(.caption)
-                                .foregroundStyle(.red)
+                                .foregroundStyle(Color.readableRed)
                             VStack(alignment: .leading, spacing: 2) {
                                 Text("KTC trend declining")
                                     .font(.subheadline)
                                 Text("Average KTC score has decreased over the last \(count) assessments.")
                                     .font(.caption)
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(Color.readableSecondary)
                             }
                             Spacer()
                             TrendBadge(direction: .declining)
@@ -1247,7 +1264,7 @@ struct TechnicalSummarySection: View {
                     HStack {
                         Text("Current Stage")
                             .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.readableSecondary)
                         Spacer()
                         DevelopmentStagePill(stage: athlete.developmentStage)
                     }
@@ -1255,7 +1272,7 @@ struct TechnicalSummarySection: View {
                     HStack {
                         Text("Most recent")
                             .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.readableSecondary)
                         Spacer()
                         Text(latestAssessment.date.formatted(.dateTime.month(.abbreviated).day().year()))
                             .font(.subheadline)
@@ -1264,7 +1281,7 @@ struct TechnicalSummarySection: View {
                     HStack {
                         Text("Average score")
                             .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.readableSecondary)
                         Spacer()
                         Text(String(format: "%.2f / 5", latestAssessment.averageScore))
                             .font(.subheadline)
@@ -1359,13 +1376,13 @@ struct NotesSection: View {
                 Spacer()
                 Text("\(groupedNotes.count) practice\(groupedNotes.count == 1 ? "" : "s")")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.readableSecondary)
             }
 
             if groupedNotes.isEmpty {
                 Text("No notes recorded yet")
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.readableSecondary)
             } else {
                 VStack(spacing: 8) {
                     ForEach(visibleGroups) { group in
@@ -1408,7 +1425,7 @@ struct SessionNotesCard: View {
                 Spacer()
                 Text(group.sessionDate.formatted(.dateTime.month(.abbreviated).day().year()))
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.readableSecondary)
             }
 
             Divider()
@@ -1435,12 +1452,12 @@ struct NoteRow: View {
             HStack(spacing: 8) {
                 Text(sessionDate.formatted(.dateTime.month(.abbreviated).day().year()))
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.readableSecondary)
 
                 if let block = note.sessionBlock {
                     Text("• \(block.blockName)")
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.readableSecondary)
 
                     if let zone = block.trainingZone {
                         TrainingZonePill(zone: zone)
@@ -1524,14 +1541,14 @@ struct DevelopmentFocusPanel: View {
                     SectionHeader(title: "Development Focus")
                     Spacer()
                     Text("Needs a technical assessment")
-                        .font(.caption).foregroundStyle(.secondary)
+                        .font(.caption).foregroundStyle(Color.readableSecondary)
                 }
             } else if coverage.isEmpty && strengths.isEmpty {
                 HStack(alignment: .firstTextBaseline) {
                     SectionHeader(title: "Development Focus")
                     Spacer()
                     Text("No factors scored ≤ 2 or ≥ 4")
-                        .font(.caption).foregroundStyle(.secondary)
+                        .font(.caption).foregroundStyle(Color.readableSecondary)
                 }
             } else {
                 SectionHeader(title: "Development Focus")
@@ -1540,7 +1557,7 @@ struct DevelopmentFocusPanel: View {
                     if !coverage.isEmpty {
                         VStack(alignment: .leading, spacing: 6) {
                             Text("Focus Areas")
-                                .font(.caption).fontWeight(.semibold).foregroundStyle(.orange)
+                                .font(.caption).fontWeight(.semibold).foregroundStyle(Color.readableOrange)
                             VStack(spacing: 5) {
                                 ForEach(coverage) { entry in
                                     HStack(spacing: 10) {
@@ -1548,12 +1565,12 @@ struct DevelopmentFocusPanel: View {
                                             Text(entry.rating.factor)
                                                 .font(.caption).fontWeight(.semibold)
                                             Text(entry.rating.category)
-                                                .font(.caption2).foregroundStyle(.secondary)
+                                                .font(.caption2).foregroundStyle(Color.readableSecondary)
                                             coverageSubtitle(for: entry)
                                         }
                                         Spacer()
                                         Text("\(entry.rating.score)/5")
-                                            .font(.caption).fontWeight(.bold).foregroundStyle(.orange)
+                                            .font(.caption).fontWeight(.bold).foregroundStyle(Color.readableOrange)
                                         Button {
                                             noteRequest = DevelopmentNoteSheetRequest(
                                                 initialTags: matchingPredefinedTags(for: entry.rating)
@@ -1561,7 +1578,7 @@ struct DevelopmentFocusPanel: View {
                                         } label: {
                                             Image(systemName: "note.text.badge.plus")
                                                 .font(.subheadline)
-                                                .foregroundStyle(.orange)
+                                                .foregroundStyle(Color.readableOrange)
                                                 .frame(width: 44, height: 44)  // HIG minimum tap target
                                                 .contentShape(Rectangle())
                                         }
@@ -1578,7 +1595,7 @@ struct DevelopmentFocusPanel: View {
                     if !strengths.isEmpty {
                         VStack(alignment: .leading, spacing: 6) {
                             Text("Strengths")
-                                .font(.caption).fontWeight(.semibold).foregroundStyle(.green)
+                                .font(.caption).fontWeight(.semibold).foregroundStyle(Color.readableGreen)
                             VStack(spacing: 5) {
                                 ForEach(strengths) { rating in
                                     HStack {
@@ -1586,11 +1603,11 @@ struct DevelopmentFocusPanel: View {
                                             Text(rating.factor)
                                                 .font(.caption).fontWeight(.semibold)
                                             Text(rating.category)
-                                                .font(.caption2).foregroundStyle(.secondary)
+                                                .font(.caption2).foregroundStyle(Color.readableSecondary)
                                         }
                                         Spacer()
                                         Text("\(rating.score)/5")
-                                            .font(.caption).fontWeight(.bold).foregroundStyle(.green)
+                                            .font(.caption).fontWeight(.bold).foregroundStyle(Color.readableGreen)
                                     }
                                     .padding(.horizontal, 10).padding(.vertical, 7)
                                     .background(Color.green.opacity(0.10), in: RoundedRectangle(cornerRadius: 8))
@@ -1602,7 +1619,7 @@ struct DevelopmentFocusPanel: View {
 
                 if let date = athlete.latestTechnicalAssessment?.date {
                     Text("From assessment \(date.formatted(.dateTime.month(.abbreviated).day().year()))")
-                        .font(.caption2).foregroundStyle(.secondary)
+                        .font(.caption2).foregroundStyle(Color.readableSecondary)
                 }
             }
         }
@@ -1620,7 +1637,7 @@ struct DevelopmentFocusPanel: View {
     private func coverageSubtitle(for entry: DevelopmentCoverage) -> some View {
         if entry.isCovered {
             Text("💬 \(entry.noteCount) \(entry.noteCount == 1 ? "note" : "notes") in last \(InsightThresholds.coverageWindowDays)d")
-                .font(.caption2).foregroundStyle(.secondary)
+                .font(.caption2).foregroundStyle(Color.readableSecondary)
         } else {
             Text("⚠ No recent notes — uncovered")
                 .font(.caption2).italic()
@@ -1687,7 +1704,7 @@ struct KTCAssessmentRow: View {
                         .fontWeight(.medium)
                     Text(assessment.date.formatted(.dateTime.month(.abbreviated).day().year()))
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.readableSecondary)
                 }
                 Spacer()
                 VStack(alignment: .trailing, spacing: 2) {
@@ -1696,22 +1713,22 @@ struct KTCAssessmentRow: View {
                         .fontWeight(.semibold)
                     Text("avg")
                         .font(.caption2)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.readableSecondary)
                 }
             }
 
             HStack(spacing: 0) {
                 KTCPhaseScore(label: "Setup", score: assessment.setupRecoveryScore)
                 Spacer()
-                Text("·").font(.caption2).foregroundStyle(.secondary)
+                Text("·").font(.caption2).foregroundStyle(Color.readableSecondary)
                 Spacer()
                 KTCPhaseScore(label: "Catch", score: assessment.catchScore)
                 Spacer()
-                Text("·").font(.caption2).foregroundStyle(.secondary)
+                Text("·").font(.caption2).foregroundStyle(Color.readableSecondary)
                 Spacer()
                 KTCPhaseScore(label: "Prop", score: assessment.propulsionDrawScore)
                 Spacer()
-                Text("·").font(.caption2).foregroundStyle(.secondary)
+                Text("·").font(.caption2).foregroundStyle(Color.readableSecondary)
                 Spacer()
                 KTCPhaseScore(label: "Exit", score: assessment.exitScore)
             }
@@ -1719,7 +1736,7 @@ struct KTCAssessmentRow: View {
             if let notes = assessment.notes, !notes.isEmpty {
                 Text(notes)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.readableSecondary)
             }
         }
         .padding(12)
@@ -1775,7 +1792,7 @@ struct KTCPhaseScore: View {
         VStack(spacing: 2) {
             Text(label)
                 .font(.caption2)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.readableSecondary)
             Text("\(score)/5")
                 .font(.caption)
                 .fontWeight(.semibold)
@@ -1934,7 +1951,7 @@ struct DevelopmentNoteCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(note.date.formatted(.dateTime.month(.abbreviated).day().year()))
-                .font(.caption).foregroundStyle(.secondary)
+                .font(.caption).foregroundStyle(Color.readableSecondary)
 
             Text(note.text)
                 .font(.subheadline)
@@ -2173,7 +2190,7 @@ struct HeightGrowthSection: View {
                         HStack {
                             Text(record.date.formatted(.dateTime.month(.abbreviated).day().year()))
                                 .font(.caption)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(Color.readableSecondary)
                             Spacer()
                             Text(String(format: "%.1f cm", record.heightCm))
                                 .font(.subheadline)
@@ -2189,14 +2206,14 @@ struct HeightGrowthSection: View {
                 if growthVelocity == nil && sortedHeights.count >= 2 {
                     Text("Last two measurements are under 2 months apart — too close together to estimate growth velocity.")
                         .font(.caption2)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.readableSecondary)
                 }
 
                 if let velocity = growthVelocity {
                     HStack(spacing: 10) {
                         if isPHV {
                             Image(systemName: "exclamationmark.triangle.fill")
-                                .foregroundStyle(.orange)
+                                .foregroundStyle(Color.readableOrange)
                                 .font(.subheadline)
                         } else {
                             Image(systemName: "arrow.up.right")
@@ -2210,7 +2227,7 @@ struct HeightGrowthSection: View {
                             if isPHV {
                                 Text("Possible PHV — consider reducing training load")
                                     .font(.caption2)
-                                    .foregroundStyle(.orange)
+                                    .foregroundStyle(Color.readableOrange)
                             }
                         }
                         Spacer()
@@ -2225,7 +2242,7 @@ struct HeightGrowthSection: View {
 
                 Text("CKC requires 4 height measurements per year.")
                     .font(.caption2)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.readableSecondary)
             }
         }
         .sheet(isPresented: $showingAddHeight) {
@@ -2264,12 +2281,12 @@ struct AddHeightRecordSheet: View {
                             .keyboardType(.decimalPad)
 #endif
                         Text("cm")
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.readableSecondary)
                     }
                     if !heightText.isEmpty && parsedHeight == nil {
                         Text("Enter a height between 50 and 250 cm")
                             .font(.caption)
-                            .foregroundStyle(.red)
+                            .foregroundStyle(Color.readableRed)
                     }
                     DatePicker("Date", selection: $date, in: ...Date.now, displayedComponents: .date)
                 }

@@ -55,6 +55,7 @@
         apple_user_id varchar(255),
         color_hex varchar(255),
         created_at datetime(6),
+        deleted_at datetime(6),
         email varchar(255),
         name varchar(255) not null,
         nccp_level varchar(255),
@@ -139,6 +140,17 @@
         setup_recovery_score integer not null,
         ktc_window varchar(255) not null,
         athlete_id binary(16) not null,
+        primary key (id)
+    ) engine=InnoDB;
+
+    create table pending_apple_revocation (
+        id binary(16) not null,
+        updated_at datetime(6) not null,
+        attempts integer not null,
+        client_id varchar(255) not null,
+        created_at datetime(6),
+        token varchar(2048) not null,
+        token_type_hint varchar(255) not null,
         primary key (id)
     ) engine=InnoDB;
 

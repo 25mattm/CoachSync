@@ -36,4 +36,12 @@ nonisolated enum BackendConfig {
         return defaultBaseURL
 #endif
     }
+
+    /// The published privacy policy, or nil in a build with no value set. Read in Debug too, unlike
+    /// `baseURL`: there's no local stand-in for a policy.
+    static var privacyPolicyURL: URL? {
+        guard let raw = Bundle.main.object(forInfoDictionaryKey: "CoachSyncPrivacyPolicyURL") as? String,
+              !raw.trimmingCharacters(in: .whitespaces).isEmpty else { return nil }
+        return URL(string: raw)
+    }
 }

@@ -32,32 +32,34 @@ struct TeamsView: View {
         NavigationStack {
             Group {
                 if activeTeams.isEmpty {
-                    VStack(spacing: 20) {
-                        Spacer()
-                        Image(systemName: "person.3")
-                            .font(.system(.largeTitle))
-                            .imageScale(.large)
-                            .foregroundStyle(.secondary)
-                        Text("No Teams Yet")
-                            .font(.title2).fontWeight(.bold)
-                        Text("Create a team and add athletes\nto start logging practices.")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                            .multilineTextAlignment(.center)
-                        Button {
-                            showingAddTeam = true
-                        } label: {
-                            Label("Create First Team", systemImage: "plus")
-                                .font(.headline)
-                                .foregroundStyle(colorScheme == .dark ? .black : .white)
-                                .padding(.horizontal, 24)
-                                .padding(.vertical, 14)
-                                .background(Color.accentColor)
-                                .clipShape(RoundedRectangle(cornerRadius: 14))
+                    ScrollsWhenTooTall {
+                        VStack(spacing: 20) {
+                            Spacer()
+                            Image(systemName: "person.3")
+                                .font(.system(.largeTitle))
+                                .imageScale(.large)
+                                .foregroundStyle(Color.readableSecondary)
+                            Text("No Teams Yet")
+                                .font(.title2).fontWeight(.bold)
+                            Text("Create a team and add athletes\nto start logging practices.")
+                                .font(.subheadline)
+                                .foregroundStyle(Color.readableSecondary)
+                                .multilineTextAlignment(.center)
+                            Button {
+                                showingAddTeam = true
+                            } label: {
+                                Label("Create First Team", systemImage: "plus")
+                                    .font(.headline)
+                                    .foregroundStyle(colorScheme == .dark ? .black : .white)
+                                    .padding(.horizontal, 24)
+                                    .padding(.vertical, 14)
+                                    .background(Color.accentColor)
+                                    .clipShape(RoundedRectangle(cornerRadius: 14))
+                            }
+                            Spacer()
                         }
-                        Spacer()
+                        .padding()
                     }
-                    .padding()
                 } else {
                     List {
                         Section {
@@ -152,14 +154,14 @@ struct TeamRow: View {
                 HStack(spacing: 8) {
                     Text("\(team.activeMembers.count) athlete\(team.activeMembers.count == 1 ? "" : "s")")
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.readableSecondary)
 
                     if team.isArchived {
                         Text("Archived")
                             .font(.caption2)
                             .foregroundStyle(.white)
                             .padding(.horizontal, 6).padding(.vertical, 2)
-                            .background(Color.gray)
+                            .background(Color.filledGray)
                             .clipShape(Capsule())
                     }
                 }
@@ -269,7 +271,7 @@ struct TeamDetailView: View {
                 if activeMembers.isEmpty {
                     Text("No athletes yet — tap + to add")
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.readableSecondary)
                 } else {
                     ForEach(activeMembers) { athlete in
                         NavigationLink(destination: AthleteProfileView(athlete: athlete)) {
@@ -300,6 +302,7 @@ struct TeamDetailView: View {
                     } label: {
                         Label("Add Athlete", systemImage: "person.badge.plus")
                             .font(.caption).fontWeight(.semibold)
+                            .comfortableTapTarget()
                     }
                 }
             }
@@ -308,7 +311,7 @@ struct TeamDetailView: View {
                 Section("Notes") {
                     Text(desc)
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.readableSecondary)
                 }
             }
 
@@ -401,37 +404,38 @@ struct TeamTrainingLoadCard: View {
     let seasonalKm: Double
     let zoneBreakdown: [(zone: TrainingZone, km: Double)]
 
+    private func loadStat(_ km: Double, label: String, color: Color) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(String(format: "%.1f", km))
+                .font(.title2)
+                .fontWeight(.bold)
+                .foregroundStyle(color)
+            Text(label)
+                .font(.caption)
+                .foregroundStyle(Color.readableSecondary)
+        }
+        .fixedSize()
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             SectionHeader(title: "Training Load")
 
-            HStack(spacing: 24) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(String(format: "%.1f", weeklyKm))
-                        .font(.title2)
-                        .fontWeight(.bold)
-                        .foregroundStyle(Color.accentColor)
-                    Text("km last 7 days")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+            ViewThatFits(in: .horizontal) {
+                HStack(alignment: .top, spacing: 24) {
+                    loadStat(weeklyKm, label: "km last 7 days", color: .accentColor)
+                    loadStat(seasonalKm, label: "km this season", color: .readableGreen)
+                    Spacer()
                 }
-
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(String(format: "%.1f", seasonalKm))
-                        .font(.title2)
-                        .fontWeight(.bold)
-                        .foregroundStyle(.green)
-                    Text("km this season")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                VStack(alignment: .leading, spacing: 12) {
+                    loadStat(weeklyKm, label: "km last 7 days", color: .accentColor)
+                    loadStat(seasonalKm, label: "km this season", color: .readableGreen)
                 }
-
-                Spacer()
             }
 
             Text("Seasonal km by zone")
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.readableSecondary)
 
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
@@ -443,7 +447,7 @@ struct TeamTrainingLoadCard: View {
                                 .foregroundStyle(item.zone.color)
                             Text(item.zone.description)
                                 .font(.caption2)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(Color.readableSecondary)
                                 .lineLimit(2)
                             Text(String(format: "%.1f km", item.km))
                                 .font(.caption)
@@ -566,10 +570,10 @@ struct AddMemberSheet: View {
                         Spacer()
                         Image(systemName: "person.slash")
                             .font(.largeTitle)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.readableSecondary)
                         Text("All active athletes are already on this team")
                             .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.readableSecondary)
                             .multilineTextAlignment(.center)
                         Spacer()
                     }

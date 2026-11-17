@@ -243,16 +243,17 @@ class CrossClubSweepTest {
      * operator-only routes are cross-club by design (OperatorGuard), and every fixture coach is an
      * operator in tests, so sweeping them would only prove the operator can do its job.
      */
-    private static final Map<String, String> EXEMPT = Map.of(
-            "POST /api/auth/apple", "pre-auth sign-in; no tenant exists yet",
-            "POST /api/clubs", "operator-only (OperatorGuard); creates a new club",
-            "POST /api/coaches/{id}/approve", "operator-only (OperatorGuard); cross-club by design",
-            "POST /api/coaches/{id}/remove", "operator-only (OperatorGuard); cross-club by design; CoachRemovalTest",
-            "POST /api/clubs/join", "JoinFlowTest",
-            "POST /api/athletes", "CreateByIdCollisionTest (body-supplied id collision)",
-            "POST /api/sessions", "CreateByIdCollisionTest, RelationshipIsolationTest (foreign teamId)",
-            "POST /api/teams", "CreateByIdCollisionTest",
-            "POST /api/coaches", "CoachIsolationTest.clubBCannotHijackAClubACoachIdViaCreate");
+    private static final Map<String, String> EXEMPT = Map.ofEntries(
+            Map.entry("POST /api/auth/apple", "pre-auth sign-in; no tenant exists yet"),
+            Map.entry("POST /api/account/delete", "acts only on the caller's own coach; AccountDeletionTest"),
+            Map.entry("POST /api/clubs", "operator-only (OperatorGuard); creates a new club"),
+            Map.entry("POST /api/coaches/{id}/approve", "operator-only (OperatorGuard); cross-club by design"),
+            Map.entry("POST /api/coaches/{id}/remove", "operator-only (OperatorGuard); cross-club by design; CoachRemovalTest"),
+            Map.entry("POST /api/clubs/join", "JoinFlowTest"),
+            Map.entry("POST /api/athletes", "CreateByIdCollisionTest (body-supplied id collision)"),
+            Map.entry("POST /api/sessions", "CreateByIdCollisionTest, RelationshipIsolationTest (foreign teamId)"),
+            Map.entry("POST /api/teams", "CreateByIdCollisionTest"),
+            Map.entry("POST /api/coaches", "CoachIsolationTest.clubBCannotHijackAClubACoachIdViaCreate"));
 
     @Test
     void everyApiRouteIsSweptOrExplicitlyExempt() {

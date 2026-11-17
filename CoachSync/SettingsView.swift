@@ -31,6 +31,7 @@ struct SettingsView: View {
     @State private var showingSaveError = false
     @State private var saveErrorMessage = ""
     @State private var showingUnsyncedSignOutAlert = false
+    @State private var showingDeleteAccount = false
 
     /// Completed but not-yet-archived practices — the archive action's input.
     var completedSessions: [CoachSession] { activeSessions.filter { $0.status == .completed } }
@@ -67,11 +68,11 @@ struct SettingsView: View {
             if let session = auth.currentSession {
                 HStack(spacing: 12) {
                     Image(systemName: "checkmark.seal.fill")
-                        .foregroundStyle(.green)
+                        .foregroundStyle(Color.readableGreen)
                     VStack(alignment: .leading, spacing: 2) {
                         Text(session.coach.name)
                         Text("Signed in to the club backend")
-                            .font(.caption).foregroundStyle(.secondary)
+                            .font(.caption).foregroundStyle(Color.readableSecondary)
                     }
                 }
                 Button {
@@ -88,10 +89,11 @@ struct SettingsView: View {
                 .disabled(sync.status == .syncing)
                 syncStatusLabel
                 Button("Sign Out", role: .destructive) { signOutTapped() }
+                Button("Delete Account…", role: .destructive) { showingDeleteAccount = true }
             } else {
                 SignInWithAppleButtonView()
                 if let error = auth.errorMessage {
-                    Text(error).font(.caption).foregroundStyle(.red)
+                    Text(error).font(.caption).foregroundStyle(Color.readableRed)
                 }
             }
         } header: {
@@ -108,20 +110,20 @@ struct SettingsView: View {
         case .success(let date, let stuckCount) where stuckCount > 0:
             VStack(alignment: .leading, spacing: 2) {
                 Text("Last synced \(date.formatted(date: .omitted, time: .shortened))")
-                    .font(.caption).foregroundStyle(.secondary)
+                    .font(.caption).foregroundStyle(Color.readableSecondary)
                 Text(stuckCount == 1
                      ? "1 change couldn't sync — check for invalid data (e.g. an email field) and try again."
                      : "\(String(stuckCount)) changes couldn't sync — check for invalid data (e.g. an email field) and try again.")
-                    .font(.caption).foregroundStyle(.orange)
+                    .font(.caption).foregroundStyle(Color.readableOrange)
             }
         case .success(let date, _):
             Text("Last synced \(date.formatted(date: .omitted, time: .shortened))")
-                .font(.caption).foregroundStyle(.secondary)
+                .font(.caption).foregroundStyle(Color.readableSecondary)
         case .failed(let message):
-            Text(message).font(.caption).foregroundStyle(.red)
+            Text(message).font(.caption).foregroundStyle(Color.readableRed)
         case .needsReauth:
             Text("Your session expired — sign out and sign in again.")
-                .font(.caption).foregroundStyle(.red)
+                .font(.caption).foregroundStyle(Color.readableRed)
         case .idle, .syncing:
             EmptyView()
         }
@@ -175,7 +177,7 @@ struct SettingsView: View {
                                         .filter { !$0.isEmpty }
                                         .joined(separator: " · ")
                                     if !detail.isEmpty {
-                                        Text(detail).font(.caption).foregroundStyle(.secondary)
+                                        Text(detail).font(.caption).foregroundStyle(Color.readableSecondary)
                                     }
                                 }
                                 Spacer()
@@ -234,28 +236,28 @@ struct SettingsView: View {
                         // String() — Int interpolation in Text applies locale
                         // grouping and renders the year as "2,026".
                         Text(String(currentSeasonYear))
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.readableSecondary)
                     }
 
                     HStack {
                         Text("Completed Practices")
                         Spacer()
                         Text("\(currentSeasonCompletedSessions.count)")
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.readableSecondary)
                     }
 
                     HStack {
                         Text("Total Km Logged")
                         Spacer()
                         Text(String(format: "%.1f km", currentSeasonKm))
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.readableSecondary)
                     }
 
                     Button {
                         showingArchiveSeasonAlert = true
                     } label: {
                         Label("Archive Completed Practices", systemImage: "archivebox.fill")
-                            .foregroundStyle(.orange)
+                            .foregroundStyle(Color.readableOrange)
                     }
                     .disabled(completedSessions.isEmpty)
                 } header: {
@@ -275,18 +277,18 @@ struct SettingsView: View {
                                     Spacer()
                                     Text(archive.archiveDate.formatted(.dateTime.month(.abbreviated).day().year()))
                                         .font(.caption)
-                                        .foregroundStyle(.secondary)
+                                        .foregroundStyle(Color.readableSecondary)
                                 }
                                 HStack(spacing: 12) {
                                     Text("\(archive.totalSessions) practice\(archive.totalSessions == 1 ? "" : "s")")
                                         .font(.caption)
-                                        .foregroundStyle(.secondary)
+                                        .foregroundStyle(Color.readableSecondary)
                                     Text(String(format: "%.1f km", archive.totalKm))
                                         .font(.caption)
-                                        .foregroundStyle(.secondary)
+                                        .foregroundStyle(Color.readableSecondary)
                                     Text("\(archive.totalAthletes) athletes")
                                         .font(.caption)
-                                        .foregroundStyle(.secondary)
+                                        .foregroundStyle(Color.readableSecondary)
                                 }
                             }
                             .padding(.vertical, 2)
@@ -301,14 +303,14 @@ struct SettingsView: View {
                         showingResetSessionDataAlert = true
                     } label: {
                         Label("Reset Session Data", systemImage: "trash")
-                            .foregroundStyle(.orange)
+                            .foregroundStyle(Color.readableOrange)
                     }
 
                     Button {
                         showingClearDataAlert = true
                     } label: {
                         Label("Reset All Data", systemImage: "exclamationmark.triangle.fill")
-                            .foregroundStyle(.red)
+                            .foregroundStyle(Color.readableRed)
                     }
                 } header: {
                     Text("Data Management")
@@ -321,24 +323,33 @@ struct SettingsView: View {
                         Text("App")
                         Spacer()
                         Text("CoachSync")
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.readableSecondary)
                     }
                     HStack {
                         Text("Version")
                         Spacer()
                         Text(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.1")
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.readableSecondary)
                     }
                     HStack {
                         Text("Built for")
                         Spacer()
                         Text("Paddling coaches")
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.readableSecondary)
+                    }
+                    if let policy = BackendConfig.privacyPolicyURL {
+                        Link("Privacy Policy", destination: policy)
                     }
                 }
             }
             .formStyle(.grouped)
             .navigationTitle("Settings")
+            .sheet(isPresented: $showingDeleteAccount) {
+                DeleteAccountSheet()
+#if os(macOS)
+                    .frame(minWidth: 480, minHeight: 460)
+#endif
+            }
             .sheet(isPresented: $showingImport) {
                 CSVImportView()
 #if os(macOS)
@@ -501,7 +512,7 @@ struct AgeCategoryRow: View {
             Spacer()
             Text(rule)
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.readableSecondary)
         }
     }
 }

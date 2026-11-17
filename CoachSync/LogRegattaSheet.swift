@@ -105,7 +105,7 @@ struct LogRegattaSheet: View {
                     if teams.isEmpty {
                         Text("No teams — showing all active athletes")
                             .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.readableSecondary)
                     } else {
                         Picker("Team", selection: $selectedTeam) {
                             Text("All Athletes").tag(nil as Team?)
@@ -130,7 +130,7 @@ struct LogRegattaSheet: View {
                     Section {
                         Text("No athletes in this team")
                             .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.readableSecondary)
                     }
                 } else {
                     Section {
@@ -220,7 +220,7 @@ private struct AthleteTimeRow: View {
                     .font(.subheadline)
                 Text(athlete.ageCategory)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.readableSecondary)
             }
             Spacer()
             TextField("#", text: $placementText)
@@ -234,7 +234,16 @@ private struct AthleteTimeRow: View {
             TextField("MM:SS.ms", text: $timeText)
                 .frame(width: 90)
                 .multilineTextAlignment(.trailing)
-                .foregroundStyle(isValidTime ? Color.primary : Color.red)
+                .foregroundStyle(isValidTime ? Color.primary : Color.readableRed)
+                .overlay(alignment: .leading) {
+                    if !isValidTime {
+                        Image(systemName: "exclamationmark.circle")
+                            .foregroundStyle(Color.readableRed)
+                            .offset(x: -18)
+                            .accessibilityHidden(true)
+                    }
+                }
+                .accessibilityValue(isValidTime ? timeText : "\(timeText), not a valid time")
 #if os(iOS)
                 .keyboardType(.numbersAndPunctuation)
 #endif

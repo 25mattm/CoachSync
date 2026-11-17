@@ -74,3 +74,9 @@ extension JSONEncoder {
         return encoder
     }()
 }
+
+/// Body of `POST /api/account/delete`.
+nonisolated struct DeleteAccountRequestDTO: Encodable {
+    let authorizationCode: String
+    let clientId: String
+}

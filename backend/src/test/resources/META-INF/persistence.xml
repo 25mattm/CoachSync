@@ -13,6 +13,7 @@
     <persistence-unit name="coachsync-ddl" transaction-type="RESOURCE_LOCAL">
         <class>com.coachsync.domain.Club</class>
         <class>com.coachsync.domain.Coach</class>
+        <class>com.coachsync.domain.PendingAppleRevocation</class>
         <class>com.coachsync.domain.Athlete</class>
         <class>com.coachsync.domain.Team</class>
         <class>com.coachsync.domain.TeamMembership</class>

@@ -47,7 +47,7 @@ struct CSVImportView: View {
                             .scaleEffect(1.5)
                         Text("Importing athletes...")
                             .font(.headline)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.readableSecondary)
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
 
@@ -240,7 +240,7 @@ struct ReadyPhaseView: View {
 
                     Text("Your CSV file must have these columns in order:")
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.readableSecondary)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 16)
                 }
@@ -269,7 +269,7 @@ struct ReadyPhaseView: View {
                 // Footer note
                 Text("Date format: MM/DD/YYYY. First row is the header.")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.readableSecondary)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 16)
 
@@ -310,7 +310,7 @@ struct FormatRow: View {
                     .fontWeight(.medium)
                 Text("e.g. \(example)")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.readableSecondary)
             }
 
             Spacer(minLength: 12)
@@ -326,7 +326,7 @@ struct FormatRow: View {
             } else {
                 Text("Optional")
                     .font(.caption2)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.readableSecondary)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 4)
                     .background(Color.secondary.opacity(0.15))
@@ -354,18 +354,18 @@ struct PreviewPhaseView: View {
                 HStack(spacing: 32) {
                     VStack(spacing: 4) {
                         Text("\(athletes.count)")
-                            .font(.title2).fontWeight(.bold).foregroundStyle(.green)
-                        Text("Ready").font(.caption).foregroundStyle(.secondary)
+                            .font(.title2).fontWeight(.bold).foregroundStyle(Color.readableGreen)
+                        Text("Ready").font(.caption).foregroundStyle(Color.readableSecondary)
                     }
                     VStack(spacing: 4) {
                         Text("\(duplicateCount)")
-                            .font(.title2).fontWeight(.bold).foregroundStyle(.orange)
-                        Text("Duplicates").font(.caption).foregroundStyle(.secondary)
+                            .font(.title2).fontWeight(.bold).foregroundStyle(Color.readableOrange)
+                        Text("Duplicates").font(.caption).foregroundStyle(Color.readableSecondary)
                     }
                     VStack(spacing: 4) {
                         Text("\(errors.count)")
-                            .font(.title2).fontWeight(.bold).foregroundStyle(.red)
-                        Text("Errors").font(.caption).foregroundStyle(.secondary)
+                            .font(.title2).fontWeight(.bold).foregroundStyle(Color.readableRed)
+                        Text("Errors").font(.caption).foregroundStyle(Color.readableSecondary)
                     }
                 }
                 .frame(maxWidth: .infinity)
@@ -379,12 +379,12 @@ struct PreviewPhaseView: View {
                     ForEach(errors, id: \.self) { error in
                         HStack(alignment: .top, spacing: 8) {
                             Image(systemName: "exclamationmark.circle.fill")
-                                .foregroundStyle(.red)
+                                .foregroundStyle(Color.readableRed)
                                 .font(.caption)
                                 .padding(.top, 2)
                             Text(error)
                                 .font(.caption)
-                                .foregroundStyle(.red)
+                                .foregroundStyle(Color.readableRed)
                         }
                     }
                 }
@@ -402,11 +402,11 @@ struct PreviewPhaseView: View {
                             }
                             Text(athlete.dateOfBirth.formatted(.dateTime.month(.abbreviated).day().year()))
                                 .font(.caption)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(Color.readableSecondary)
                             if let guardian = athlete.guardianName {
                                 Text(guardian)
                                     .font(.caption)
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(Color.readableSecondary)
                             }
                         }
                         .padding(.vertical, 2)
@@ -461,14 +461,14 @@ struct DonePhaseView: View {
             Image(systemName: "checkmark.circle.fill")
                 .font(.system(.largeTitle))
                 .imageScale(.large)
-                .foregroundStyle(.green)
+                .foregroundStyle(Color.readableGreen)
 
             VStack(spacing: 8) {
                 Text("Import Complete")
                     .font(.title2).fontWeight(.bold)
                 Text("\(count) athlete\(count == 1 ? "" : "s") added successfully.")
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.readableSecondary)
             }
 
             if !errors.isEmpty {
@@ -478,7 +478,7 @@ struct DonePhaseView: View {
                     ForEach(errors, id: \.self) { error in
                         Text("• \(error)")
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.readableSecondary)
                     }
                 }
                 .padding(12)
